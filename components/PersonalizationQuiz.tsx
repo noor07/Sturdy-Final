@@ -25,9 +25,9 @@ const lessonTimeOptions = [
 ];
 
 const ChevronDownIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-  </svg>
+    <span className="material-symbols-outlined text-slate-400">
+        expand_more
+    </span>
 );
 
 
@@ -58,15 +58,15 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
     switch (step) {
       case 1:
         return (
-          <div className="flex flex-col h-full">
-            <div className="flex-grow flex flex-col justify-center">
+          <div className="flex flex-col h-full glass-card p-6 rounded-2xl">
+            <div className="flex-grow flex flex-col">
               <div className="text-center mb-6">
                 <h1 className="text-2xl font-bold">Tell us about you</h1>
                 <p className="text-slate-400 text-sm mt-1">This will help us personalize your experience.</p>
               </div>
 
               <div className="flex justify-center mb-6">
-                <div className="w-24 h-24 bg-[#E0E0E0] rounded-full border-2 border-slate-600 flex items-center justify-center overflow-hidden">
+                <div className="w-24 h-24 bg-white/20 rounded-full border-2 border-white/20 flex items-center justify-center overflow-hidden">
                   {React.createElement(Avatars[userData.avatar], { className: 'w-24 h-24' })}
                 </div>
               </div>
@@ -74,9 +74,9 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
               <div className="space-y-6">
                 <div>
                   <label className="text-sm font-medium text-slate-300 mb-2 block">Choose your avatar</label>
-                  <div className="grid grid-cols-5 gap-4">
+                  <div className="grid grid-cols-5 gap-3">
                     {Avatars.map((_, index) => (
-                      <button key={index} onClick={() => setUserData(prev => ({ ...prev, avatar: index }))} className={`rounded-full transition-all duration-200 aspect-square ${userData.avatar === index ? 'ring-2 ring-purple-400' : ''}`}>
+                      <button key={index} onClick={() => setUserData(prev => ({ ...prev, avatar: index }))} className={`rounded-full transition-all duration-200 aspect-square ${userData.avatar === index ? 'ring-2 ring-purple-400 scale-110' : 'opacity-70 hover:opacity-100'}`}>
                         {React.createElement(Avatars[index], { className: 'w-full h-full' })}
                       </button>
                     ))}
@@ -91,7 +91,7 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
                     value={userData.name}
                     onChange={(e) => setUserData(prev => ({...prev, name: e.target.value}))}
                     placeholder="e.g. Alex"
-                    className="w-full bg-[#3A3D42] text-white placeholder-slate-400 border-none rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A499F8] transition-all"
+                    className="w-full glass-input text-white placeholder-slate-400 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all"
                   />
                 </div>
 
@@ -102,19 +102,19 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
                       id="birthYear"
                       value={userData.birthYear}
                       onChange={(e) => setUserData(prev => ({...prev, birthYear: e.target.value}))}
-                      className="w-full bg-[#3A3D42] text-white appearance-none border-none rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A499F8] transition-all"
+                      className="w-full glass-input text-white appearance-none rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all"
                     >
                       {years.map(year => <option key={year} value={year}>{year}</option>)}
                     </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                    <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
                       <ChevronDownIcon />
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="pt-6">
-              <button onClick={handleNext} disabled={!userData.name} className="w-full bg-[#3A3D42] disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold py-3 px-4 rounded-xl transition-colors hover:bg-slate-600">
+            <div className="pt-6 mt-auto">
+              <button onClick={handleNext} disabled={!userData.name} className="w-full bg-slate-200/90 text-slate-900 disabled:bg-slate-700 disabled:text-slate-500 font-bold py-3 px-4 rounded-xl transition-all hover:bg-white transform hover:scale-105">
                 Next
               </button>
             </div>
@@ -127,24 +127,23 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
         const field: keyof typeof userData = isStep2 ? 'currentStatus' : 'mainGoal';
 
         return (
-          <div className="flex flex-col h-full justify-center">
+          <div className="flex flex-col h-full justify-center glass-card p-6 rounded-2xl">
             <h1 className="text-2xl font-bold text-center mb-8">{title}</h1>
-            <div className="space-y-3">
-              {/* Fix: Use specific option arrays directly instead of a union-typed variable to prevent type errors. */}
+            <div className="space-y-3 overflow-y-auto">
               {isStep2 ? (
                 currentStatusOptions.map(option => (
-                  <button key={option} onClick={() => handleSelectOptionAndNext(field, option)} className="w-full bg-[#3A3D42] p-4 rounded-xl text-left hover:bg-slate-700/80 transition-all duration-200 ring-1 ring-white/10 hover:ring-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400">
-                    <span className="text-slate-300 font-medium">{option}</span>
+                  <button key={option} onClick={() => handleSelectOptionAndNext(field, option)} className="w-full glass-input p-4 rounded-xl text-left hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                    <span className="text-slate-200 font-medium">{option}</span>
                   </button>
                 ))
               ) : (
                 Object.entries(mainGoalOptions).map(([category, catOptions]) => (
                   <div key={category}>
-                    <h2 className="text-sm font-semibold text-slate-400 my-3 px-1">{category}</h2>
+                    <h2 className="text-sm font-semibold text-slate-400 my-3 px-1 uppercase tracking-wider">{category}</h2>
                     <div className="space-y-3">
                     {catOptions.map(option => (
-                      <button key={option} onClick={() => handleSelectOptionAndNext(field, option)} className="w-full bg-[#3A3D42] p-4 rounded-xl text-left hover:bg-slate-700/80 transition-all duration-200 ring-1 ring-white/10 hover:ring-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400">
-                        <span className="text-slate-300 font-medium">{option}</span>
+                      <button key={option} onClick={() => handleSelectOptionAndNext(field, option)} className="w-full glass-input p-4 rounded-xl text-left hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                        <span className="text-slate-200 font-medium">{option}</span>
                       </button>
                     ))}
                     </div>
@@ -156,7 +155,7 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
         );
       case 4:
         return (
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full glass-card p-6 rounded-2xl">
             <div className="flex-grow flex flex-col justify-center">
               <div className="text-center mb-8">
                 <h1 className="text-2xl font-bold">Select your daily lesson time</h1>
@@ -168,16 +167,16 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
                     key={option}
                     onClick={() => setUserData(prev => ({...prev, lessonTime: option}))}
                     className={`w-full p-4 rounded-xl text-left transition-all duration-200 ring-1 focus:outline-none focus:ring-2 focus:ring-purple-400 ${
-                      userData.lessonTime === option ? 'bg-[#4A4469] ring-purple-400' : 'bg-[#3A3D42] ring-white/10 hover:bg-slate-700/80 hover:ring-purple-400'
+                      userData.lessonTime === option ? 'bg-purple-500/40 ring-purple-400' : 'glass-input ring-transparent hover:bg-white/20'
                     }`}
                   >
-                    <span className="text-slate-300 font-medium">{option}</span>
+                    <span className="text-slate-200 font-medium">{option}</span>
                   </button>
                 ))}
               </div>
             </div>
-            <div className="pt-6">
-              <button onClick={onComplete} className="w-full bg-white text-black font-bold py-4 px-4 rounded-full text-lg transition-transform transform hover:scale-105">
+            <div className="pt-6 mt-auto">
+              <button onClick={onComplete} className="w-full bg-white text-black font-bold py-4 px-4 rounded-full text-lg transition-transform transform hover:scale-105 shadow-lg shadow-white/20">
                 Start Learning
               </button>
             </div>
@@ -189,8 +188,8 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
   };
 
   return (
-    <div className="min-h-screen bg-[#1A1C20] text-white p-6 flex flex-col">
-       <div className="w-full bg-[#3A3D42] rounded-full h-1.5 mb-8 mt-2">
+    <div className="min-h-screen bg-[#1A1C20] text-white p-4 flex flex-col">
+       <div className="w-full bg-white/10 rounded-full h-1.5 mb-6 mt-2">
         <div
           className="bg-white h-1.5 rounded-full transition-all duration-500 ease-in-out"
           style={{ width: `${progressPercentage}%` }}
