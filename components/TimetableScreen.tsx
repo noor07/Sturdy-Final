@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import type { TimetableEvent } from '../types';
 import { AddIcon } from './icons/Icons';
 
@@ -10,28 +10,47 @@ interface TimetableScreenProps {
 const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events }) => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentTime, setCurrentTime] = useState(new Date());
+
     const selectedDateRef = useRef<HTMLButtonElement>(null);
+    const isInitialMount = useRef(true);
 
     useEffect(() => {
         const timerId = setInterval(() => setCurrentTime(new Date()), 1000 * 60); // Update every minute
         return () => clearInterval(timerId);
     }, []);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (selectedDateRef.current) {
-            selectedDateRef.current.scrollIntoView({
-                behavior: 'smooth',
-                inline: 'center',
-                block: 'nearest'
-            });
+            if (isInitialMount.current) {
+                // For the very first load, a small delay can help ensure the layout is fully computed
+                // before we try to scroll. This is a common workaround for tricky race conditions.
+                const timerId = setTimeout(() => {
+                    selectedDateRef.current?.scrollIntoView({
+                        behavior: 'auto',
+                        inline: 'center',
+                        block: 'nearest',
+                    });
+                }, 0);
+                isInitialMount.current = false;
+                return () => clearTimeout(timerId);
+            } else {
+                // For subsequent date selections, scroll smoothly without delay.
+                selectedDateRef.current.scrollIntoView({
+                    behavior: 'smooth',
+                    inline: 'center',
+                    block: 'nearest',
+                });
+            }
         }
-    }, []); // Run only once on mount to center the initial date
+    }, [selectedDate]);
 
-    const getDaysForScroller = (centerDate: Date) => {
+
+    const getDaysForScroller = () => {
         const dates = [];
+        const today = new Date();
         // Generate a wider range of dates for better scrollability (approx. 6 months in each direction).
         for (let i = -182; i <= 182; i++) {
-            const date = new Date(centerDate);
+            const date = new Date(today);
             date.setDate(date.getDate() + i);
             dates.push(date);
         }
@@ -48,7 +67,7 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events }) => 
         return events.some(event => isSameDay(new Date(event.startTime), day));
     };
 
-    const days = getDaysForScroller(new Date());
+    const days = getDaysForScroller();
     const hours = Array.from({ length: 24 }, (_, i) => {
         const date = new Date();
         date.setHours(i, 0, 0, 0);
@@ -78,7 +97,6 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events }) => 
                 <div className="flex overflow-x-auto space-x-4 py-3 no-scrollbar">
                     {days.map((day) => {
                         const isSelected = isSameDay(day, selectedDate);
-                        const isToday = isSameDay(day, new Date());
                         return (
                             <button
                                 key={day.toISOString()}
@@ -100,7 +118,7 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events }) => 
 
             <main className="flex-1 overflow-y-auto px-4 mt-4 relative no-scrollbar">
                 <div className="relative">
-                    {hours.map((hour, index) => (
+                    {hours.map((hour) => (
                         <div key={hour} className="flex items-start h-20">
                             <div className="w-16 text-right pr-4">
                                 <span className="text-xs text-gray-500">{hour}</span>

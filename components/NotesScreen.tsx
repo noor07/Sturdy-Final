@@ -85,10 +85,8 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
     const onFileSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
         if (files) {
-            // FIX: Explicitly type 'file' as File to resolve 'unknown' type error.
             const imageFiles = Array.from(files).filter((file: File) => file.type.startsWith('image/'));
-
-            const oversizedFiles = imageFiles.filter(f => f.size > 10 * 1024 * 1024);
+            const oversizedFiles = imageFiles.filter((f: File) => f.size > 10 * 1024 * 1024);
             if (oversizedFiles.length > 0) {
                  alert(`Error: Some images exceed the 10MB size limit.`);
                  return;
