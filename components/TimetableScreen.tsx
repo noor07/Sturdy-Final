@@ -132,10 +132,10 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events }) => 
             </main>
             
             <button
-                className="fixed bottom-24 right-6 w-16 h-16 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-xl transform hover:scale-110 transition-all duration-200 z-40"
+                className="fixed bottom-24 right-6 w-12 h-12 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-xl transform hover:scale-110 transition-all duration-200 z-40"
                 aria-label="Add new event"
             >
-                <AddIcon className="w-9 h-9" />
+                <AddIcon className="w-6 h-6" />
             </button>
             <style>{`
                 .no-scrollbar::-webkit-scrollbar {
