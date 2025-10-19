@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import type { TimetableEvent } from '../types';
 import { AddIcon } from './icons/Icons';
+import AddEventModal from './AddEventModal';
 
 interface TimetableScreenProps {
     onBack: () => void;
     events: TimetableEvent[];
+    onAddEvent: (event: Omit<TimetableEvent, 'id'>) => void;
 }
 
-const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events }) => {
+const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAddEvent }) => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
 
     const selectedDateRef = useRef<HTMLButtonElement>(null);
     const isInitialMount = useRef(true);
@@ -65,6 +68,11 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events }) => 
 
     const hasEventsOnDay = (day: Date) => {
         return events.some(event => isSameDay(new Date(event.startTime), day));
+    };
+
+    const handleSaveEvent = (newEventData: Omit<TimetableEvent, 'id'>) => {
+      onAddEvent(newEventData);
+      setIsAddEventModalOpen(false);
     };
 
     const days = getDaysForScroller();
@@ -132,11 +140,21 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events }) => 
             </main>
             
             <button
+                onClick={() => setIsAddEventModalOpen(true)}
                 className="fixed bottom-24 right-6 w-12 h-12 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-xl transform hover:scale-110 transition-all duration-200 z-40"
                 aria-label="Add new event"
             >
                 <AddIcon className="w-6 h-6" />
             </button>
+
+            {isAddEventModalOpen && (
+                <AddEventModal 
+                    onClose={() => setIsAddEventModalOpen(false)} 
+                    onSave={handleSaveEvent} 
+                    selectedDate={selectedDate}
+                />
+            )}
+
             <style>{`
                 .no-scrollbar::-webkit-scrollbar {
                     display: none;

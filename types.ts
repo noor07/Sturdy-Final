@@ -55,8 +55,10 @@ export interface Note {
 export interface TimetableEvent {
   id: string;
   title: string;
-  subjectName: string;
+  subjectName?: string;
+  description?: string;
   startTime: string; // ISO string
   endTime: string;   // ISO string
   color: string;
+  repeats?: string;
 }

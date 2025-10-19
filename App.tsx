@@ -143,6 +143,14 @@ const App: React.FC = () => {
       );
       setSelectedNote(prevNote => prevNote ? { ...prevNote, ...updatedData } as Note : null);
   };
+  
+  const handleAddEvent = (newEventData: Omit<TimetableEvent, 'id'>) => {
+    const newEvent: TimetableEvent = {
+        id: `evt-${Date.now()}`,
+        ...newEventData,
+    };
+    setTimetableEvents(prevEvents => [...prevEvents, newEvent]);
+  };
 
 
   const renderScreen = () => {
@@ -191,6 +199,7 @@ const App: React.FC = () => {
             return <TimetableScreen 
                 onBack={() => setCurrentScreen('home')} 
                 events={timetableEvents} 
+                onAddEvent={handleAddEvent}
             />;
         default:
              return <HomeScreen 
