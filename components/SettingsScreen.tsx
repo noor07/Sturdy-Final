@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Subject } from '../types';
 import { ClockIcon, GraduationCapIcon, TrashIcon } from './icons/Icons';
 
@@ -55,16 +55,48 @@ const mainGoalOptions: Record<string, string[]> = {
 
 interface SettingsScreenProps {
     subjects: Subject[];
+    dailyGoal: number;
+    examGoal: string;
     onAddSubject: (name: string) => void;
     onDeleteSubject: (id: string) => void;
     onBack: () => void;
+    onDailyGoalChange: (goal: number) => void;
+    onExamGoalChange: (goal: string) => void;
+    setSubjects: (subjects: Subject[]) => void;
 }
 
-const SettingsScreen: React.FC<SettingsScreenProps> = ({ subjects, onAddSubject, onDeleteSubject, onBack }) => {
-    const [dailyGoal, setDailyGoal] = useState(6);
+const SettingsScreen: React.FC<SettingsScreenProps> = ({ 
+    subjects, 
+    dailyGoal,
+    examGoal,
+    onAddSubject, 
+    onDeleteSubject, 
+    onBack,
+    onDailyGoalChange,
+    onExamGoalChange,
+    setSubjects,
+}) => {
     const [isAddingSubject, setIsAddingSubject] = useState(false);
-    const [examGoal, setExamGoal] = useState('Class 12 Board Exams');
     const [isSelectingExamGoal, setIsSelectingExamGoal] = useState(false);
+    
+    const [initialSettings, setInitialSettings] = useState({ dailyGoal, examGoal, subjects });
+    const [hasChanges, setHasChanges] = useState(false);
+    const [showSavedMessage, setShowSavedMessage] = useState(false);
+
+    useEffect(() => {
+        // Capture initial state only on mount
+        setInitialSettings({ dailyGoal, examGoal, subjects });
+    }, []);
+
+    useEffect(() => {
+        // Check if current state differs from initial state
+        const changesExist =
+            dailyGoal !== initialSettings.dailyGoal ||
+            examGoal !== initialSettings.examGoal ||
+            JSON.stringify(subjects) !== JSON.stringify(initialSettings.subjects);
+        setHasChanges(changesExist);
+    }, [dailyGoal, examGoal, subjects, initialSettings]);
+
 
     const subjectColors = ['#F87171', '#FBBF24', '#C084FC', '#60A5FA', '#34D399', '#FB923C'];
 
@@ -74,15 +106,36 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ subjects, onAddSubject,
     };
     
     const handleSelectExamGoal = (goal: string) => {
-        setExamGoal(goal);
+        onExamGoalChange(goal);
         setIsSelectingExamGoal(false);
     };
 
+    const handleSave = () => {
+        setInitialSettings({ dailyGoal, examGoal, subjects });
+        setShowSavedMessage(true);
+        setTimeout(() => setShowSavedMessage(false), 2000);
+    };
+    
+    const handleBack = () => {
+        if (hasChanges) {
+            if (window.confirm('You have unsaved changes. Are you sure you want to leave?')) {
+                // Revert changes to their initial state before navigating back
+                onDailyGoalChange(initialSettings.dailyGoal);
+                onExamGoalChange(initialSettings.examGoal);
+                setSubjects(initialSettings.subjects);
+                onBack();
+            }
+        } else {
+            onBack();
+        }
+    };
+
+
     return (
-        <div className="bg-[#1F2125] min-h-screen text-white font-sans">
+        <div className="bg-[#1F2125] min-h-screen text-white font-sans pb-28">
             <div className="p-4 max-w-md mx-auto">
                 <header className="flex items-center py-4 relative justify-center">
-                    <button onClick={onBack} className="absolute left-0 p-2 rounded-full hover:bg-white/10 transition-colors">
+                    <button onClick={handleBack} className="absolute left-0 p-2 rounded-full hover:bg-white/10 transition-colors">
                         <MaterialIcon name="arrow_back_ios_new" className="text-gray-300 !text-xl" />
                     </button>
                     <h1 className="text-lg font-bold">Settings</h1>
@@ -108,7 +161,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ subjects, onAddSubject,
                                 max="16"
                                 step="2"
                                 value={dailyGoal}
-                                onChange={(e) => setDailyGoal(Number(e.target.value))}
+                                onChange={(e) => onDailyGoalChange(Number(e.target.value))}
                                 className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer range-thumb"
                             />
 
@@ -190,6 +243,25 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ subjects, onAddSubject,
                     </div>
                 </div>
             )}
+
+            {/* Save Button */}
+            {hasChanges && (
+                <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 z-20 bg-gradient-to-t from-[#1F2125] via-[#1F2125] to-transparent">
+                    <button
+                        onClick={handleSave}
+                        disabled={showSavedMessage}
+                        className="w-full bg-[#A89AFF] disabled:bg-green-500 text-black font-bold py-3 px-4 rounded-full text-lg transition-all transform hover:scale-105 shadow-lg shadow-[#A89AFF]/30"
+                    >
+                         {showSavedMessage ? (
+                            <span className="flex items-center justify-center">
+                                <MaterialIcon name="check" className="!text-xl mr-2" />
+                                Saved!
+                            </span>
+                        ) : 'Save Changes'}
+                    </button>
+                </div>
+            )}
+
 
              <style>{`
                 .range-thumb::-webkit-slider-thumb {

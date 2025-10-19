@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import type { Subject } from '../types';
-import BottomNavBar from './BottomNavBar';
 import { Avatars } from './icons/Avatars';
 
 const CircularProgress: React.FC<{ progress: number, size?: number, strokeWidth?: number }> = ({ progress, size = 48, strokeWidth = 4 }) => {
@@ -302,8 +301,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
             ))}
         </main>
       </div>
-
-      <BottomNavBar />
     </div>
   );
 };

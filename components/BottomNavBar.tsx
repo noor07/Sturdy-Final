@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Screen } from '../App';
 
 const MaterialIcon: React.FC<{ name: string, isActive: boolean, isFilled?: boolean }> = ({ name, isActive, isFilled = false }) => (
     <span 
@@ -19,9 +20,12 @@ const NavItem: React.FC<{ icon: string; label: string; isActive: boolean; onClic
   </button>
 );
 
-const BottomNavBar: React.FC = () => {
-  const [activeTab, setActiveTab] = React.useState('Home');
+interface BottomNavBarProps {
+    activeTab: Screen;
+    onNavigate: (screen: Screen) => void;
+}
 
+const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, onNavigate }) => {
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-sm z-50">
       <div className="glass-card rounded-full p-1.5 shadow-2xl">
@@ -29,27 +33,26 @@ const BottomNavBar: React.FC = () => {
           <NavItem
             icon="home"
             label="Home"
-            isActive={activeTab === 'Home'}
-            onClick={() => setActiveTab('Home')}
+            isActive={activeTab === 'home'}
+            onClick={() => onNavigate('home')}
           />
           <NavItem
             icon="style"
             label="Flashcards"
-            isActive={activeTab === 'Flashcards'}
-            onClick={() => setActiveTab('Flashcards')}
+            isActive={activeTab === 'flashcards'}
+            onClick={() => onNavigate('flashcards')}
           />
           <NavItem
             icon="description"
             label="Notes"
-            // Fix: Corrected typo from `active-tab` to `activeTab`. This resolves the `active`, `tab`, and comparison errors.
-            isActive={activeTab === 'Notes'}
-            onClick={() => setActiveTab('Notes')}
+            isActive={activeTab === 'notes'}
+            onClick={() => onNavigate('notes')}
           />
           <NavItem
             icon="calendar_today"
             label="Timetable"
-            isActive={activeTab === 'Timetable'}
-            onClick={() => setActiveTab('Timetable')}
+            isActive={activeTab === 'timetable'}
+            onClick={() => onNavigate('timetable')}
           />
         </div>
       </div>

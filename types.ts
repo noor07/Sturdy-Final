@@ -33,10 +33,30 @@ export interface Topic {
 }
 
 export interface Subject {
-  id: string;
+  id:string;
   name: string;
   progress: number;
   timeSpent: string;
   topics: Topic[];
   isExpanded: boolean;
+}
+
+// New type for Notes
+export interface Note {
+  id: string;
+  title: string;
+  subjectName: string;
+  content?: string;
+  images?: string[];
+  createdAt: string;
+}
+
+// New type for Timetable
+export interface TimetableEvent {
+  id: string;
+  title: string;
+  subjectName: string;
+  startTime: string; // ISO string
+  endTime: string;   // ISO string
+  color: string;
 }

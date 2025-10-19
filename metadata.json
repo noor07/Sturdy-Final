@@ -1,5 +1,7 @@
 {
   "name": "Studyfy",
   "description": "Your personal study companion. Generate notes, take quizzes, track your progress, and stay motivated with interactive tools powered by Gemini.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "camera"
+  ]
 }

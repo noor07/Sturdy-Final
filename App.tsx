@@ -4,7 +4,12 @@ import PersonalizationWelcome from './components/PersonalizationWelcome';
 import PersonalizationQuiz from './components/PersonalizationQuiz';
 import HomeScreen from './components/HomeScreen';
 import SettingsScreen from './components/SettingsScreen';
-import type { Subject } from './types';
+import FlashcardsScreen from './components/FlashcardsScreen';
+import NotesScreen from './components/NotesScreen';
+import TimetableScreen from './components/TimetableScreen';
+import BottomNavBar from './components/BottomNavBar';
+import NoteDetailScreen from './components/NoteDetailScreen';
+import type { Subject, Note, TimetableEvent } from './types';
 
 // Moved from HomeScreen so it can be shared with SettingsScreen
 const MOCK_DATA: Subject[] = [
@@ -44,14 +49,45 @@ const MOCK_DATA: Subject[] = [
     { id: 'pol', name: 'Political Science', progress: 0, timeSpent: '00h 00m', isExpanded: false, topics: [] }
 ];
 
+const getTodayAtTime = (hour: number, minute: number) => {
+    const today = new Date();
+    today.setHours(hour, minute, 0, 0);
+    return today.toISOString();
+};
+
+const MOCK_EVENTS: TimetableEvent[] = [
+    {
+        id: 'evt1',
+        title: 'Maths Lecture',
+        subjectName: 'Mathematics',
+        startTime: getTodayAtTime(9, 0),
+        endTime: getTodayAtTime(10, 30),
+        color: '#F87171' // Red
+    },
+    {
+        id: 'evt2',
+        title: 'Physics Lab',
+        subjectName: 'Science',
+        startTime: getTodayAtTime(14, 0),
+        endTime: getTodayAtTime(16, 0),
+        color: '#60A5FA' // Blue
+    }
+];
+
+export type Screen = 'home' | 'flashcards' | 'notes' | 'timetable' | 'settings';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [personalizationStep, setPersonalizationStep] = useState<'welcome' | 'quiz' | 'complete'>('welcome');
   const [userName, setUserName] = useState<string>('');
   const [userAvatar, setUserAvatar] = useState<number>(8);
-  const [currentScreen, setCurrentScreen] = useState<'home' | 'settings'>('home');
+  const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [subjects, setSubjects] = useState<Subject[]>(MOCK_DATA);
+  const [dailyGoal, setDailyGoal] = useState(6);
+  const [examGoal, setExamGoal] = useState('Class 12 Board Exams');
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [timetableEvents, setTimetableEvents] = useState<TimetableEvent[]>(MOCK_EVENTS);
 
 
   const handleLogin = () => {
@@ -84,6 +120,89 @@ const App: React.FC = () => {
       setSubjects(prevSubjects => prevSubjects.filter(subject => subject.id !== id));
   };
 
+  const handleAddNote = (newNoteData: Omit<Note, 'id' | 'createdAt'>) => {
+    const newNote: Note = {
+        id: `note-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        ...newNoteData
+    };
+    setNotes(prevNotes => [newNote, ...prevNotes]);
+  };
+  
+  const handleDeleteNote = (noteId: string) => {
+    if (window.confirm('Are you sure you want to delete this note?')) {
+        setNotes(prevNotes => prevNotes.filter(note => note.id !== noteId));
+    }
+  };
+
+  const handleUpdateNote = (noteId: string, updatedData: Partial<Omit<Note, 'id' | 'createdAt'>>) => {
+      setNotes(prevNotes => 
+          prevNotes.map(note => 
+              note.id === noteId ? { ...note, ...updatedData, createdAt: note.createdAt } : note
+          )
+      );
+      setSelectedNote(prevNote => prevNote ? { ...prevNote, ...updatedData } as Note : null);
+  };
+
+
+  const renderScreen = () => {
+    if (selectedNote) {
+        return <NoteDetailScreen
+            note={selectedNote}
+            subjects={subjects}
+            onBack={() => setSelectedNote(null)}
+            onUpdateNote={handleUpdateNote}
+        />
+    }
+
+    switch(currentScreen) {
+        case 'home':
+            return <HomeScreen 
+                userName={userName} 
+                userAvatar={userAvatar}
+                subjects={subjects}
+                setSubjects={setSubjects}
+                onNavigateToSettings={() => setCurrentScreen('settings')}
+            />;
+        case 'settings':
+             return <SettingsScreen 
+                subjects={subjects}
+                dailyGoal={dailyGoal}
+                examGoal={examGoal}
+                onAddSubject={handleAddSubject}
+                onDeleteSubject={handleDeleteSubject}
+                onBack={() => setCurrentScreen('home')}
+                onDailyGoalChange={setDailyGoal}
+                onExamGoalChange={setExamGoal}
+                setSubjects={setSubjects} // Pass setter for reverting changes
+            />
+        case 'flashcards':
+            return <FlashcardsScreen onBack={() => setCurrentScreen('home')} />;
+        case 'notes':
+            return <NotesScreen 
+                onBack={() => setCurrentScreen('home')} 
+                subjects={subjects}
+                notes={notes}
+                onAddNote={handleAddNote}
+                onSelectNote={setSelectedNote}
+                onDeleteNote={handleDeleteNote}
+            />;
+        case 'timetable':
+            return <TimetableScreen 
+                onBack={() => setCurrentScreen('home')} 
+                events={timetableEvents} 
+            />;
+        default:
+             return <HomeScreen 
+                userName={userName} 
+                userAvatar={userAvatar}
+                subjects={subjects}
+                setSubjects={setSubjects}
+                onNavigateToSettings={() => setCurrentScreen('settings')}
+            />;
+    }
+  };
+
 
   if (!isAuthenticated) {
     return <Auth onLogin={handleLogin} />;
@@ -97,23 +216,22 @@ const App: React.FC = () => {
       return <PersonalizationQuiz onComplete={handlePersonalizationComplete} />;
     }
   }
+  
+  const mainScreens: Screen[] = ['home', 'flashcards', 'notes', 'timetable'];
+  const showNavBar = mainScreens.includes(currentScreen) && !selectedNote;
 
-  if (currentScreen === 'settings') {
-      return <SettingsScreen 
-        subjects={subjects}
-        onAddSubject={handleAddSubject}
-        onDeleteSubject={handleDeleteSubject}
-        onBack={() => setCurrentScreen('home')}
-      />
-  }
 
-  return <HomeScreen 
-    userName={userName} 
-    userAvatar={userAvatar}
-    subjects={subjects}
-    setSubjects={setSubjects}
-    onNavigateToSettings={() => setCurrentScreen('settings')}
-   />;
+  return (
+    <div className="bg-[#1F2125] min-h-screen">
+        {renderScreen()}
+        {showNavBar && (
+            <BottomNavBar 
+                activeTab={currentScreen}
+                onNavigate={(screen) => setCurrentScreen(screen)}
+            />
+        )}
+    </div>
+  );
 };
 
 export default App;
