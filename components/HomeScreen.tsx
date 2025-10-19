@@ -1,37 +1,7 @@
 import React, { useState } from 'react';
 import type { Subject } from '../types';
 import BottomNavBar from './BottomNavBar';
-
-const MOCK_DATA: Subject[] = [
-  {
-    id: 'sci',
-    name: 'Science',
-    progress: 3,
-    timeSpent: '00h 00m',
-    isExpanded: true,
-    topics: [
-      {
-        id: 'sci-1',
-        name: 'Chemical Reactions and Equations',
-        progress: 33,
-        isExpanded: true,
-        subTopics: [
-          { id: 'sci-1-0', name: 'New Topic', completed: true },
-          { id: 'sci-1-1', name: 'Balancing chemical equations', completed: true },
-          { id: 'sci-1-2', name: 'Types of chemical reactions (Combination, Decomposition, Displacement, etc.)', completed: false },
-          { id: 'sci-1-3', name: 'Redox reactions (Oxidation and Reduction)', completed: false },
-        ]
-      },
-      {
-        id: 'sci-2',
-        name: 'Acids, Bases and Salts',
-        progress: 0,
-        isExpanded: false,
-        subTopics: []
-      }
-    ]
-  }
-];
+import { Avatars } from './icons/Avatars';
 
 const CircularProgress: React.FC<{ progress: number, size?: number, strokeWidth?: number }> = ({ progress, size = 48, strokeWidth = 4 }) => {
   const radius = (size - strokeWidth) / 2;
@@ -109,17 +79,24 @@ const AddItemInput: React.FC<{ onSave: (name: string) => void, onCancel: () => v
     );
 };
 
-const HomeScreen: React.FC = () => {
-    const [subjects, setSubjects] = useState<Subject[]>(MOCK_DATA);
+interface HomeScreenProps {
+    userName: string;
+    userAvatar: number;
+    subjects: Subject[];
+    setSubjects: React.Dispatch<React.SetStateAction<Subject[]>>;
+    onNavigateToSettings: () => void;
+}
+
+const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects, setSubjects, onNavigateToSettings }) => {
     const [activeDate, setActiveDate] = useState<number>(18);
     const [addingState, setAddingState] = useState<{ type: 'topic' | 'subtopic'; parentId: string } | null>(null);
     
     const toggleSubject = (id: string) => {
-        setSubjects(subjects.map(s => s.id === id ? { ...s, isExpanded: !s.isExpanded } : s));
+        setSubjects(prevSubjects => prevSubjects.map(s => s.id === id ? { ...s, isExpanded: !s.isExpanded } : s));
     };
 
     const toggleTopic = (subjectId: string, topicId: string) => {
-        setSubjects(subjects.map(s => {
+        setSubjects(prevSubjects => prevSubjects.map(s => {
             if (s.id === subjectId) {
                 return {
                     ...s,
@@ -131,7 +108,7 @@ const HomeScreen: React.FC = () => {
     };
     
     const handleAddTopic = (subjectId: string, name: string) => {
-        setSubjects(subjects.map(s => {
+        setSubjects(prevSubjects => prevSubjects.map(s => {
             if (s.id === subjectId) {
                 const newTopic = {
                     id: `topic-${Date.now()}`,
@@ -148,7 +125,7 @@ const HomeScreen: React.FC = () => {
     };
 
     const handleAddSubTopic = (subjectId: string, topicId: string, name: string) => {
-        setSubjects(subjects.map(s => {
+        setSubjects(prevSubjects => prevSubjects.map(s => {
             if (s.id === subjectId) {
                 return {
                     ...s,
@@ -170,6 +147,13 @@ const HomeScreen: React.FC = () => {
         setAddingState(null);
     };
 
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'Good Morning!';
+        if (hour < 18) return 'Good Afternoon!';
+        return 'Good Evening!';
+    };
+
     const calendarDates = [
         { day: 'Oct', date: 13 }, { day: 'Oct', date: 14 }, { day: 'Oct', date: 15 },
         { day: 'Oct', date: 16 }, { day: 'Oct', date: 17 }, { day: 'Oct', date: 18 }
@@ -180,13 +164,13 @@ const HomeScreen: React.FC = () => {
       <div className="p-4 max-w-md mx-auto">
         <header className="flex justify-between items-center py-4">
           <div className="flex items-center gap-3">
-             <img src="https://i.pravatar.cc/48?u=yfv" alt="User Avatar" className="w-12 h-12 rounded-full" />
+             {React.createElement(Avatars[userAvatar] || Avatars[8], { className: 'w-12 h-12' })}
             <div>
-              <p className="text-lg font-medium">Hi Yfv</p>
-              <p className="text-sm text-gray-400">Good Afternoon!</p>
+              <p className="text-lg font-bold">Hi, {userName}</p>
+              <p className="text-sm text-gray-400">{getGreeting()}</p>
             </div>
           </div>
-          <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
+          <button onClick={onNavigateToSettings} className="p-2 rounded-full hover:bg-white/10 transition-colors">
             <MaterialIcon name="settings" className="text-gray-300" />
           </button>
         </header>
@@ -303,7 +287,12 @@ const HomeScreen: React.FC = () => {
                                 />
                                 </div>
                            ) : (
-                                <button onClick={() => setAddingState({ type: 'topic', parentId: subject.id })} className="w-full flex items-center justify-center gap-2 py-2 mt-2 text-sm text-gray-400 hover:text-white transition-colors border border-dashed border-gray-600 rounded-lg hover:border-gray-500">
+                                <button onClick={() => setAddingState({ type: 'topic', parentId: subject.id })} style={{
+                                    background: 'rgba(34, 36, 40, 1)',
+                                    border: '1px solid rgba(168, 154, 255, 0.3)',
+                                    boxShadow: '0 4px 15px rgba(168, 154, 255, 0.1)',
+                                }}
+                                className="w-full flex items-center justify-center gap-2 py-3 mt-2 text-sm font-semibold text-[#C6BEFF] rounded-xl hover:shadow-[#A89AFF]/20 hover:border-[#A89AFF]/50 transition-all duration-300">
                                     <MaterialIcon name="add" className="!text-base" /> Add Chapter
                                 </button>
                            )}

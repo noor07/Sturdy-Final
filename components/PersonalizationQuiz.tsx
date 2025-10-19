@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Avatars } from './icons/Avatars';
 
 interface PersonalizationQuizProps {
-  onComplete: () => void;
+  onComplete: (data: { name: string; avatar: number }) => void;
 }
 
 const currentStatusOptions = [
@@ -176,7 +176,7 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
               </div>
             </div>
             <div className="pt-6 mt-auto">
-              <button onClick={onComplete} className="w-full bg-white text-black font-bold py-4 px-4 rounded-full text-lg transition-transform transform hover:scale-105 shadow-lg shadow-white/20">
+              <button onClick={() => onComplete({ name: userData.name, avatar: userData.avatar })} className="w-full bg-white text-black font-bold py-4 px-4 rounded-full text-lg transition-transform transform hover:scale-105 shadow-lg shadow-white/20">
                 Start Learning
               </button>
             </div>

@@ -12,8 +12,8 @@ export const ClipboardCheckIcon = () => (
   </svg>
 );
 
-export const ClockIcon: React.FC<{ colorClass?: string }> = ({ colorClass = 'text-green-300' }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${colorClass}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+export const ClockIcon: React.FC<{ colorClass?: string; className?: string }> = ({ colorClass = 'text-blue-400', className = 'h-6 w-6' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={`${className} ${colorClass}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
@@ -99,4 +99,16 @@ export const ChevronDownIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
   </svg>
+);
+
+export const GraduationCapIcon: React.FC<{ className?: string }> = ({ className = 'h-6 w-6' }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 011.056 0l4 2a1 1 0 001.056 0l4-2a.999.999 0 011.056 0l2.606-1.302a1 1 0 000-1.84l-7-3zM3 9.369V14a1 1 0 00.553.894l6 3a1 1 0 00.894 0l6-3A1 1 0 0017 14V9.369l-6 3a1 1 0 01-.894 0l-6-3z" />
+    </svg>
+);
+
+export const TrashIcon: React.FC<{ className?: string }> = ({ className = 'h-5 w-5' }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
+    </svg>
 );
