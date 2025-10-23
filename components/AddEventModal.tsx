@@ -7,7 +7,6 @@ const MaterialIcon: FC<{ name: string, className?: string }> = ({ name, classNam
 
 const COLORS = [
     '#F87171', '#34D399', '#60A5FA', '#FBBF24', '#F9A8D4', '#F472B6', '#FB923C', '#A78BFA',
-    '#3B82F6', '#EC4899', '#10B981', '#EAB308', '#8B5CF6', '#EF4444', '#22C55E', '#4B5563',
 ];
 
 const timeOptions = Array.from({ length: 48 }, (_, i) => {
@@ -139,86 +138,97 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-            <div className="bg-[#2D2F34] w-full max-w-sm m-4 rounded-2xl shadow-2xl text-white p-4 animate-fade-in">
-                <div className="flex justify-between items-center mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+            <div className="bg-[#2D2F34] w-full max-w-sm rounded-2xl shadow-2xl text-white flex flex-col max-h-[85vh] animate-fade-in">
+                {/* Header */}
+                <div className="flex justify-between items-center px-4 py-3 flex-shrink-0 border-b border-slate-700/50">
                     <h2 className="text-xl font-bold">Add Event</h2>
                     <button onClick={onClose} className="p-1 rounded-full hover:bg-white/10">
                         <MaterialIcon name="close" />
                     </button>
                 </div>
-                
-                <div className="space-y-3">
-                    <div className="relative">
-                        <MaterialIcon name="edit" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 !text-xl" />
-                        <input type="text" placeholder="Event Title" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-[#1F2125] placeholder-gray-500 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50" />
-                    </div>
-                    <div className="relative">
-                        <MaterialIcon name="description" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 !text-xl" />
-                        <input type="text" placeholder="Description (optional)" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full bg-[#1F2125] placeholder-gray-500 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50" />
-                    </div>
 
-                    <div>
-                        <label className="text-sm font-medium text-gray-400 flex items-center gap-2 mb-2">
-                           <MaterialIcon name="sell" className="!text-base" /> Color
-                        </label>
-                        <div className="grid grid-cols-8 gap-1.5">
-                            {COLORS.map(color => (
-                                <button key={color} onClick={() => setSelectedColor(color)} className="w-7 h-7 rounded-full flex items-center justify-center transition-transform transform hover:scale-110" style={{ backgroundColor: color }}>
-                                    {selectedColor === color && <MaterialIcon name="check" className="text-white !text-lg" />}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="relative">
-                         <label className="text-sm font-medium text-gray-400 mb-1 block">Repeats</label>
-                         <select value={repeats} onChange={(e) => setRepeats(e.target.value)} className="w-full bg-[#1F2125] appearance-none rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50">
-                            <option>Does not repeat</option>
-                            <option>Daily</option>
-                            <option>Weekly</option>
-                            <option>Monthly</option>
-                         </select>
-                         <MaterialIcon name="expand_more" className="absolute right-3 bottom-3 text-gray-400 pointer-events-none" />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
+                {/* Scrollable Content */}
+                <div className="overflow-y-auto px-4 pt-2 pb-4 flex-1 custom-scrollbar">
+                    <div className="space-y-3">
                         <div className="relative">
-                            <label className="text-sm font-medium text-gray-400 mb-1 block">Start Time</label>
-                            <select value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-full bg-[#1F2125] appearance-none rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50">
-                                {timeOptions.map(time => <option key={time}>{time}</option>)}
-                            </select>
-                            <MaterialIcon name="expand_more" className="absolute right-3 bottom-3 text-gray-400 pointer-events-none" />
+                            <MaterialIcon name="edit" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 !text-xl" />
+                            <input type="text" placeholder="Event Title" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-[#1F2125] placeholder-gray-500 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50" />
                         </div>
                         <div className="relative">
-                            <label className="text-sm font-medium text-gray-400 mb-1 block">End Time</label>
-                            <select value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-full bg-[#1F2125] appearance-none rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50">
-                                {timeOptions.map(time => <option key={time}>{time}</option>)}
-                            </select>
-                            <MaterialIcon name="expand_more" className="absolute right-3 bottom-3 text-gray-400 pointer-events-none" />
+                            <MaterialIcon name="description" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 !text-xl" />
+                            <input type="text" placeholder="Description (optional)" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full bg-[#1F2125] placeholder-gray-500 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50" />
+                        </div>
+
+                        <div>
+                            <label className="text-sm font-medium text-gray-400 flex items-center gap-2 mb-2">
+                               <MaterialIcon name="sell" className="!text-base" /> Color
+                            </label>
+                            <div className="grid grid-cols-8 gap-1.5">
+                                {COLORS.map(color => (
+                                    <button key={color} onClick={() => setSelectedColor(color)} className="w-7 h-7 rounded-full flex items-center justify-center transition-transform transform hover:scale-110" style={{ backgroundColor: color }}>
+                                        {selectedColor === color && <MaterialIcon name="check" className="text-white !text-lg" />}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="relative">
+                             <label className="text-sm font-medium text-gray-400 mb-1 block">Repeats</label>
+                             <select value={repeats} onChange={(e) => setRepeats(e.target.value)} className="w-full bg-[#1F2125] appearance-none rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50">
+                                <option>Does not repeat</option>
+                                <option>Daily</option>
+                                <option>Weekly</option>
+                                <option>Monthly</option>
+                             </select>
+                             <MaterialIcon name="expand_more" className="absolute right-3 bottom-3 text-gray-400 pointer-events-none" />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="relative">
+                                <label className="text-sm font-medium text-gray-400 mb-1 block">Start Time</label>
+                                <select value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-full bg-[#1F2125] appearance-none rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50">
+                                    {timeOptions.map(time => <option key={time}>{time}</option>)}
+                                </select>
+                                <MaterialIcon name="expand_more" className="absolute right-3 bottom-3 text-gray-400 pointer-events-none" />
+                            </div>
+                            <div className="relative">
+                                <label className="text-sm font-medium text-gray-400 mb-1 block">End Time</label>
+                                <select value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-full bg-[#1F2125] appearance-none rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50">
+                                    {timeOptions.map(time => <option key={time}>{time}</option>)}
+                                </select>
+                                <MaterialIcon name="expand_more" className="absolute right-3 bottom-3 text-gray-400 pointer-events-none" />
+                            </div>
+                        </div>
+
+                         <div>
+                            <div className="text-center text-sm text-gray-400 mb-2 flex items-center justify-center gap-2">
+                                <MaterialIcon name="schedule" className="!text-base" /> {duration}
+                            </div>
+                            <label className="text-xs font-medium text-gray-500 mb-1 block text-center">Day's Schedule</label>
+                            <div className="bg-[#1F2125] rounded-full h-3 relative overflow-hidden">
+                                <div className="absolute top-0 h-full rounded-full" style={{...scheduleBarStyle, backgroundColor: selectedColor}}></div>
+                                <div className="absolute inset-0 flex justify-between items-center px-1">
+                                    <div className="w-px h-full bg-slate-600/50"></div>
+                                    <div className="w-px h-full bg-slate-600/50"></div>
+                                    <div className="w-px h-full bg-slate-600/50"></div>
+                                </div>
+                            </div>
+                            <div className="flex justify-between text-xs text-gray-500 mt-1 px-1">
+                                <span>0h</span><span>6h</span><span>12h</span><span>18h</span><span>24h</span>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                     <div>
-                        <div className="text-center text-sm text-gray-400 mb-2 flex items-center justify-center gap-2">
-                            <MaterialIcon name="schedule" className="!text-base" /> {duration}
-                        </div>
-                        <label className="text-xs font-medium text-gray-500 mb-1 block text-center">Day's Schedule</label>
-                        <div className="bg-[#1F2125] rounded-full h-3 relative overflow-hidden">
-                            <div className="absolute top-0 h-full rounded-full" style={{...scheduleBarStyle, backgroundColor: selectedColor}}></div>
-                        </div>
-                        <div className="flex justify-between text-xs text-gray-500 mt-1 px-1">
-                            <span>0h</span><span>6h</span><span>12h</span><span>18h</span><span>24h</span>
-                        </div>
-                    </div>
-
-                    {error && (
-                        <div className="bg-red-900/50 border border-red-500/50 text-red-400 text-sm p-3 rounded-lg flex items-center gap-2">
+                {/* Footer */}
+                <div className="px-4 py-3 flex-shrink-0 border-t border-slate-700/50">
+                     {error && (
+                        <div className="bg-red-900/50 border border-red-500/50 text-red-400 text-sm p-3 rounded-lg flex items-center gap-2 mb-3">
                             <MaterialIcon name="error" className="!text-xl" />
                             <span>{error}</span>
                         </div>
                     )}
-
                     <button onClick={handleSave} className="w-full bg-[#A89AFF] text-black font-bold py-3 px-4 rounded-xl text-lg transition-all transform hover:scale-105 shadow-lg shadow-[#A89AFF]/30">
                         Save Event
                     </button>
@@ -231,6 +241,20 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
                 }
                 .animate-fade-in {
                     animation: fade-in 0.2s ease-out;
+                }
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 6px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: #4B5563;
+                    border-radius: 3px;
+                }
+                .custom-scrollbar {
+                    scrollbar-width: thin;
+                    scrollbar-color: #4B5563 transparent;
                 }
             `}</style>
         </div>
