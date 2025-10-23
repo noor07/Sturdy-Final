@@ -21,15 +21,17 @@ interface AddEventModalProps {
     onClose: () => void;
     onSave: (event: Omit<TimetableEvent, 'id'>) => void;
     selectedDate: Date;
+    events: TimetableEvent[];
 }
 
-const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate }) => {
+const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, events }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [selectedColor, setSelectedColor] = useState(COLORS[0]);
     const [repeats, setRepeats] = useState('Does not repeat');
     const [startTime, setStartTime] = useState('12:00 PM');
     const [endTime, setEndTime] = useState('1:00 PM');
+    const [error, setError] = useState<string | null>(null);
     
     const timeToMinutes = (timeStr: string) => {
         const [time, modifier] = timeStr.split(' ');
@@ -81,10 +83,48 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate }
         newDate.setHours(hour, parseInt(minutes, 10), 0, 0);
         return newDate.toISOString();
     };
+    
+    const isSameDay = (d1: Date, d2: Date) => {
+        return d1.getFullYear() === d2.getFullYear() &&
+               d1.getMonth() === d2.getMonth() &&
+               d1.getDate() === d2.getDate();
+    };
+
 
     const handleSave = () => {
+        setError(null); // Clear previous errors
+
+        // 1. Title validation
         if (!title.trim()) {
-            alert('Please enter an event title.');
+            setError('Please enter an event title.');
+            return;
+        }
+
+        // 2. Duration validation
+        const startMinutes = timeToMinutes(startTime);
+        const endMinutes = timeToMinutes(endTime);
+        if (endMinutes <= startMinutes) {
+            setError('End time must be after start time.');
+            return;
+        }
+
+        const newEventStartTime = combineDateAndTime(selectedDate, startTime);
+        const newEventEndTime = combineDateAndTime(selectedDate, endTime);
+
+        // 3. Overlap validation
+        const eventsOnSelectedDay = events.filter(event => isSameDay(new Date(event.startTime), selectedDate));
+        
+        const isOverlapping = eventsOnSelectedDay.some(existingEvent => {
+            const existingStart = new Date(existingEvent.startTime).getTime();
+            const existingEnd = new Date(existingEvent.endTime).getTime();
+            const newStart = new Date(newEventStartTime).getTime();
+            const newEnd = new Date(newEventEndTime).getTime();
+    
+            return newStart < existingEnd && newEnd > existingStart;
+        });
+    
+        if (isOverlapping) {
+            setError('This event overlaps with another scheduled event.');
             return;
         }
         
@@ -93,8 +133,8 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate }
             description,
             color: selectedColor,
             repeats,
-            startTime: combineDateAndTime(selectedDate, startTime),
-            endTime: combineDateAndTime(selectedDate, endTime),
+            startTime: newEventStartTime,
+            endTime: newEventEndTime,
         });
     };
 
@@ -171,6 +211,13 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate }
                             <span>0h</span><span>6h</span><span>12h</span><span>18h</span><span>24h</span>
                         </div>
                     </div>
+
+                    {error && (
+                        <div className="bg-red-900/50 border border-red-500/50 text-red-400 text-sm p-3 rounded-lg flex items-center gap-2">
+                            <MaterialIcon name="error" className="!text-xl" />
+                            <span>{error}</span>
+                        </div>
+                    )}
 
                     <button onClick={handleSave} className="w-full bg-[#A89AFF] text-black font-bold py-3 px-4 rounded-xl text-lg transition-all transform hover:scale-105 shadow-lg shadow-[#A89AFF]/30">
                         Save Event

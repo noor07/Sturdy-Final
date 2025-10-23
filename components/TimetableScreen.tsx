@@ -152,6 +152,7 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
                     onClose={() => setIsAddEventModalOpen(false)} 
                     onSave={handleSaveEvent} 
                     selectedDate={selectedDate}
+                    events={events}
                 />
             )}
 
