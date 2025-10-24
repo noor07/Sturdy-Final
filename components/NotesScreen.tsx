@@ -173,28 +173,28 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                 >
                      <button
                         onClick={handleOpenCreateImageNoteModal}
-                        className="w-14 h-14 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform"
+                        className="w-10 h-10 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform"
                         aria-label="Capture note with camera"
                     >
-                        <CameraIcon className="w-7 h-7" />
+                        <CameraIcon className="w-5 h-5" />
                     </button>
                     <button
                         onClick={handleOpenCreateTextNoteModal}
-                        className="w-14 h-14 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform"
+                        className="w-10 h-10 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform"
                         aria-label="Create text note"
                     >
-                        <NotesIcon isActive className="!text-black w-8 h-8" />
+                        <NotesIcon isActive className="!text-black w-5 h-5" />
                     </button>
                 </div>
 
                 <button
                     onClick={() => setIsFabMenuOpen(!isFabMenuOpen)}
-                    className="w-16 h-16 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-xl transform hover:scale-110 transition-all duration-200"
+                    className="w-12 h-12 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-xl transform hover:scale-110 transition-all duration-200"
                     aria-expanded={isFabMenuOpen}
                     aria-label={isFabMenuOpen ? 'Close note options' : 'Open note options'}
                 >
                     <div className={`transform transition-transform duration-300 ${isFabMenuOpen ? 'rotate-45' : 'rotate-0'}`}>
-                       <AddIcon className="w-9 h-9" />
+                       <AddIcon className="w-6 h-6" />
                     </div>
                 </button>
             </div>
