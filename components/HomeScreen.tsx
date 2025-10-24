@@ -186,8 +186,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
     ];
 
   return (
-    <div className="bg-[#1F2125] min-h-screen text-white font-sans pb-32">
-      <div className="p-4 max-w-md mx-auto">
+    <div className="bg-[#1F2125] h-screen text-white font-sans overflow-y-auto no-scrollbar">
+      <div className="p-4 max-w-md mx-auto pb-32">
         <header className="flex justify-between items-center py-4">
           <div className="flex items-center gap-3">
              {React.createElement(Avatars[userAvatar] || Avatars[8], { className: 'w-12 h-12' })}
@@ -345,6 +345,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
             ))}
         </main>
       </div>
+       <style>{`
+            .no-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+            .no-scrollbar {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+        `}</style>
     </div>
   );
 };
