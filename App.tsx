@@ -173,6 +173,7 @@ const App: React.FC = () => {
                 subjects={subjects}
                 setSubjects={setSubjects}
                 onNavigateToSettings={() => setCurrentScreen('settings')}
+                events={timetableEvents}
             />;
         case 'settings':
              return <SettingsScreen 
@@ -212,6 +213,7 @@ const App: React.FC = () => {
                 subjects={subjects}
                 setSubjects={setSubjects}
                 onNavigateToSettings={() => setCurrentScreen('settings')}
+                events={timetableEvents}
             />;
     }
   };

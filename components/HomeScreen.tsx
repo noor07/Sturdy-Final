@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import type { Subject } from '../types';
+import React, { useState, useMemo } from 'react';
+import type { Subject, TimetableEvent } from '../types';
 import { Avatars } from './icons/Avatars';
 import { SettingsIcon, EditIcon, ChevronDownIcon, ChevronUpIcon, PlayArrowIcon, CheckIcon, AddIcon, CloseIcon } from './icons/Icons';
 
@@ -81,11 +81,41 @@ interface HomeScreenProps {
     subjects: Subject[];
     setSubjects: React.Dispatch<React.SetStateAction<Subject[]>>;
     onNavigateToSettings: () => void;
+    events: TimetableEvent[];
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects, setSubjects, onNavigateToSettings }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects, setSubjects, onNavigateToSettings, events }) => {
     const [activeDate, setActiveDate] = useState<number>(18);
     const [addingState, setAddingState] = useState<{ type: 'topic' | 'subtopic'; parentId: string } | null>(null);
+    
+    const { eventToShow, eventStatus } = useMemo(() => {
+        const now = new Date();
+        const todayEvents = events
+            .filter(event => {
+                const eventDate = new Date(event.startTime);
+                return eventDate.getFullYear() === now.getFullYear() &&
+                       eventDate.getMonth() === now.getMonth() &&
+                       eventDate.getDate() === now.getDate();
+            })
+            .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+
+        const currentEvent = todayEvents.find(event => {
+            const startTime = new Date(event.startTime);
+            const endTime = new Date(event.endTime);
+            return now >= startTime && now <= endTime;
+        });
+
+        if (currentEvent) {
+            return { eventToShow: currentEvent, eventStatus: 'Happening Now' };
+        }
+
+        const nextEvent = todayEvents.find(event => new Date(event.startTime) > now);
+        if (nextEvent) {
+            return { eventToShow: nextEvent, eventStatus: 'Up Next' };
+        }
+
+        return { eventToShow: null, eventStatus: null };
+    }, [events]);
     
     const toggleSubject = (id: string) => {
         setSubjects(prevSubjects => prevSubjects.map(s => s.id === id ? { ...s, isExpanded: !s.isExpanded } : s));
@@ -170,6 +200,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
             <SettingsIcon />
           </button>
         </header>
+
+        {eventToShow && (
+            <div className="glass-card rounded-xl p-4 my-6 flex items-start gap-4">
+                <div className="w-1.5 h-16 rounded-full flex-shrink-0" style={{ backgroundColor: eventToShow.color }}></div>
+                <div className="overflow-hidden">
+                    <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: eventToShow.color }}>
+                        {eventStatus}
+                    </p>
+                    <h3 className="font-bold text-lg text-white mt-1 truncate">{eventToShow.title}</h3>
+                    <p className="text-sm text-gray-300 mt-1">
+                        {new Date(eventToShow.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                        {' - '}
+                        {new Date(eventToShow.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                    </p>
+                </div>
+            </div>
+        )}
 
         <div className="flex justify-between items-center my-6 text-center">
             {calendarDates.map(({day, date}) => (
