@@ -82,10 +82,25 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
     const isToday = isSameDay(currentTime, selectedDate);
 
     const days = getDaysForScroller();
-    const hours = Array.from({ length: 24 }, (_, i) => {
+    
+    const timeIntervals = Array.from({ length: 24 * 4 }, (_, i) => {
+        const totalMinutes = i * 15;
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        
         const date = new Date();
-        date.setHours(i, 0, 0, 0);
-        return date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
+        date.setHours(hours, minutes, 0, 0);
+
+        const label = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+        
+        let styleClass = 'font-normal text-gray-600 text-[10px]';
+        if (minutes === 0) {
+            styleClass = 'font-bold text-gray-400 text-xs';
+        } else if (minutes === 30) {
+            styleClass = 'font-semibold text-gray-500 text-xs';
+        }
+
+        return { label, styleClass };
     });
 
     return (
@@ -132,20 +147,20 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
 
             <main ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 mt-4 relative no-scrollbar">
                 <div className="relative h-[168rem]"> {/* 24 hours * 7rem (h-28) */}
-                    {/* Hour Grid Lines */}
-                    {hours.map((hour, index) => (
-                        <div key={hour} className="flex items-start h-28">
-                            <div className="w-16 text-right pr-4">
-                               {index > 0 && <span className="text-xs text-gray-500 -translate-y-1/2 block">{hour}</span>}
+                    {/* 15-minute Grid Lines */}
+                    {timeIntervals.map(({ label, styleClass }, index) => (
+                        <div key={index} className="flex items-start h-7"> {/* 1.75rem height for each 15-min slot */}
+                            <div className="w-20 text-right pr-4"> {/* Increased width for time labels */}
+                                {index > 0 && <span className={`${styleClass} -translate-y-1/2 block`}>{label}</span>}
                             </div>
-                            <div className="flex-1 border-t border-gray-800 h-full"></div>
+                            <div className="flex-1 border-t border-gray-800/70 h-full"></div>
                         </div>
                     ))}
 
                     {/* Current Time Indicator */}
                     {isToday && (
                         <div 
-                            className="absolute left-16 right-0 h-0.5 bg-red-400 z-10" 
+                            className="absolute left-20 right-0 h-0.5 bg-red-400 z-10" 
                             style={{ top: `${currentTimePosition}%` }}
                         >
                             <div className="absolute -left-1.5 -top-1 w-3 h-3 rounded-full bg-red-400 border-2 border-[#1F2125]"></div>
@@ -162,7 +177,7 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
                         return (
                             <div
                                 key={event.id}
-                                className="absolute left-[4.5rem] right-0 flex items-stretch"
+                                className="absolute left-[5.5rem] right-0 flex items-stretch"
                                 style={{
                                     top: `${top}%`,
                                     height: `calc(${height}% - 2px)`,
