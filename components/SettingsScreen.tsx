@@ -80,11 +80,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
     const [showSavedMessage, setShowSavedMessage] = useState(false);
 
     useEffect(() => {
-        // Capture initial state only on mount
-        setInitialSettings({ dailyGoal, examGoal, subjects });
-    }, []);
-
-    useEffect(() => {
         // Check if current state differs from initial state
         const changesExist =
             dailyGoal !== initialSettings.dailyGoal ||
