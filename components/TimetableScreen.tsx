@@ -7,12 +7,13 @@ interface TimetableScreenProps {
     onBack: () => void;
     events: TimetableEvent[];
     onAddEvent: (event: Omit<TimetableEvent, 'id'>) => void;
+    isModalOpen: boolean;
+    setIsModalOpen: (isOpen: boolean) => void;
 }
 
-const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAddEvent }) => {
+const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAddEvent, isModalOpen, setIsModalOpen }) => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentTime, setCurrentTime] = useState(new Date());
-    const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
 
     const selectedDateRef = useRef<HTMLButtonElement>(null);
     const isInitialMount = useRef(true);
@@ -72,7 +73,6 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
 
     const handleSaveEvent = (newEventData: Omit<TimetableEvent, 'id'>) => {
       onAddEvent(newEventData);
-      setIsAddEventModalOpen(false);
     };
 
     const days = getDaysForScroller();
@@ -140,16 +140,16 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
             </main>
             
             <button
-                onClick={() => setIsAddEventModalOpen(true)}
+                onClick={() => setIsModalOpen(true)}
                 className="fixed bottom-24 right-6 w-12 h-12 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-xl transform hover:scale-110 transition-all duration-200 z-40"
                 aria-label="Add new event"
             >
                 <AddIcon className="w-6 h-6" />
             </button>
 
-            {isAddEventModalOpen && (
+            {isModalOpen && (
                 <AddEventModal 
-                    onClose={() => setIsAddEventModalOpen(false)} 
+                    onClose={() => setIsModalOpen(false)} 
                     onSave={handleSaveEvent} 
                     selectedDate={selectedDate}
                     events={events}

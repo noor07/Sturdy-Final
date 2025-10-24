@@ -88,6 +88,7 @@ const App: React.FC = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [timetableEvents, setTimetableEvents] = useState<TimetableEvent[]>(MOCK_EVENTS);
+  const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
 
 
   const handleLogin = () => {
@@ -150,6 +151,7 @@ const App: React.FC = () => {
         ...newEventData,
     };
     setTimetableEvents(prevEvents => [...prevEvents, newEvent]);
+    setIsAddEventModalOpen(false);
   };
 
 
@@ -200,6 +202,8 @@ const App: React.FC = () => {
                 onBack={() => setCurrentScreen('home')} 
                 events={timetableEvents} 
                 onAddEvent={handleAddEvent}
+                isModalOpen={isAddEventModalOpen}
+                setIsModalOpen={setIsAddEventModalOpen}
             />;
         default:
              return <HomeScreen 
@@ -227,7 +231,7 @@ const App: React.FC = () => {
   }
   
   const mainScreens: Screen[] = ['home', 'flashcards', 'notes', 'timetable'];
-  const showNavBar = mainScreens.includes(currentScreen) && !selectedNote;
+  const showNavBar = mainScreens.includes(currentScreen) && !selectedNote && !isAddEventModalOpen;
 
 
   return (
