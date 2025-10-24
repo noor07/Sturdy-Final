@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Subject } from '../types';
-import { ClockIcon, GraduationCapIcon, TrashIcon } from './icons/Icons';
-
-const MaterialIcon: React.FC<{ name: string, className?: string, onClick?: () => void }> = ({ name, className, onClick }) => (
-    <span className={`material-symbols-outlined ${className}`} onClick={onClick}>{name}</span>
-);
+import { ClockIcon, GraduationCapIcon, TrashIcon, ArrowBackIcon, CheckIcon, CloseIcon, AddIcon, ArrowForwardIcon } from './icons/Icons';
 
 const AddItemInput: React.FC<{ onSave: (name: string) => void, onCancel: () => void, placeholder: string }> = ({ onSave, onCancel, placeholder }) => {
     const [name, setName] = useState('');
@@ -35,8 +31,8 @@ const AddItemInput: React.FC<{ onSave: (name: string) => void, onCancel: () => v
                 placeholder={placeholder}
                 className="bg-transparent focus:outline-none text-sm flex-1 placeholder-gray-500"
             />
-            <button onClick={handleSave}><MaterialIcon name="check" className="text-green-400" /></button>
-            <button onClick={onCancel}><MaterialIcon name="close" className="text-gray-400" /></button>
+            <button onClick={handleSave}><CheckIcon className="w-6 h-6 text-green-400" /></button>
+            <button onClick={onCancel}><CloseIcon className="w-6 h-6 text-gray-400" /></button>
         </div>
     );
 };
@@ -136,7 +132,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
             <div className="p-4 max-w-md mx-auto">
                 <header className="flex items-center py-4 relative justify-center">
                     <button onClick={handleBack} className="absolute left-0 p-2 rounded-full hover:bg-white/10 transition-colors">
-                        <MaterialIcon name="arrow_back_ios_new" className="text-gray-300 !text-xl" />
+                        <ArrowBackIcon className="text-gray-300 w-5 h-5" />
                     </button>
                     <h1 className="text-lg font-bold">Settings</h1>
                 </header>
@@ -176,7 +172,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                                     <p className="font-semibold">Exam Goal</p>
                                     <p className="text-sm text-gray-400">{examGoal}</p>
                                </div>
-                               <MaterialIcon name="arrow_forward_ios" className="text-gray-500 !text-base" />
+                               <ArrowForwardIcon className="text-gray-500 w-4 h-4" />
                             </button>
                         </div>
                     </section>
@@ -204,7 +200,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                                     onClick={() => setIsAddingSubject(true)} 
                                     className="w-full flex items-center justify-center gap-2 py-3 mt-4 text-sm font-semibold text-white bg-[#1F2125] rounded-xl hover:bg-[#313338] transition-colors"
                                 >
-                                    <MaterialIcon name="add" className="!text-base" /> Add Custom Subject
+                                    <AddIcon className="w-4 h-4" /> Add Custom Subject
                                 </button>
                             )}
                         </div>
@@ -219,7 +215,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-bold">Select Exam Goal</h2>
                             <button onClick={() => setIsSelectingExamGoal(false)} className="p-1 rounded-full hover:bg-white/10">
-                                <MaterialIcon name="close" className="text-gray-300" />
+                                <CloseIcon className="w-6 h-6 text-gray-300" />
                             </button>
                         </div>
                         <div className="space-y-3 overflow-y-auto">
@@ -254,7 +250,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                     >
                          {showSavedMessage ? (
                             <span className="flex items-center justify-center">
-                                <MaterialIcon name="check" className="!text-xl mr-2" />
+                                <CheckIcon className="w-5 h-5 mr-2 text-black" />
                                 Saved!
                             </span>
                         ) : 'Save Changes'}

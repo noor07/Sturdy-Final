@@ -1,9 +1,7 @@
 import React, { useState, useMemo, FC } from 'react';
 import type { TimetableEvent } from '../types';
-
-const MaterialIcon: FC<{ name: string, className?: string }> = ({ name, className }) => (
-    <span className={`material-symbols-outlined ${className}`}>{name}</span>
-);
+// FIX: Imported CheckIcon to resolve 'Cannot find name' error.
+import { CloseIcon, EditIcon, NotesIcon, SellIcon, ChevronDownIcon, ClockIcon, ErrorIcon, CheckIcon } from './icons/Icons';
 
 const COLORS = [
     '#F87171', '#34D399', '#60A5FA', '#FBBF24', '#F9A8D4', '#F472B6', '#FB923C', '#A78BFA',
@@ -144,7 +142,7 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
                 <div className="flex justify-between items-center px-4 py-3 flex-shrink-0 border-b border-slate-700/50">
                     <h2 className="text-xl font-bold">Add Event</h2>
                     <button onClick={onClose} className="p-1 rounded-full hover:bg-white/10">
-                        <MaterialIcon name="close" />
+                        <CloseIcon className="w-6 h-6" />
                     </button>
                 </div>
 
@@ -152,22 +150,26 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
                 <div className="overflow-y-auto px-4 pt-2 pb-4 flex-1 custom-scrollbar">
                     <div className="space-y-3">
                         <div className="relative">
-                            <MaterialIcon name="edit" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 !text-xl" />
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                               <EditIcon className="w-5 h-5 text-gray-400" />
+                            </div>
                             <input type="text" placeholder="Event Title" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-[#1F2125] placeholder-gray-500 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50" />
                         </div>
                         <div className="relative">
-                            <MaterialIcon name="description" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 !text-xl" />
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                <NotesIcon isActive={false} className="w-5 h-5 text-gray-400" />
+                            </div>
                             <input type="text" placeholder="Description (optional)" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full bg-[#1F2125] placeholder-gray-500 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50" />
                         </div>
 
                         <div>
                             <label className="text-sm font-medium text-gray-400 flex items-center gap-2 mb-2">
-                               <MaterialIcon name="sell" className="!text-base" /> Color
+                               <SellIcon className="w-4 h-4" /> Color
                             </label>
                             <div className="grid grid-cols-8 gap-1.5">
                                 {COLORS.map(color => (
                                     <button key={color} onClick={() => setSelectedColor(color)} className="w-7 h-7 rounded-full flex items-center justify-center transition-transform transform hover:scale-110" style={{ backgroundColor: color }}>
-                                        {selectedColor === color && <MaterialIcon name="check" className="text-white !text-lg" />}
+                                        {selectedColor === color && <CheckIcon className="text-white w-5 h-5" />}
                                     </button>
                                 ))}
                             </div>
@@ -181,7 +183,9 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
                                 <option>Weekly</option>
                                 <option>Monthly</option>
                              </select>
-                             <MaterialIcon name="expand_more" className="absolute right-3 bottom-3 text-gray-400 pointer-events-none" />
+                             <div className="absolute right-3 bottom-3 text-gray-400 pointer-events-none">
+                                <ChevronDownIcon />
+                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -190,20 +194,24 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
                                 <select value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-full bg-[#1F2125] appearance-none rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50">
                                     {timeOptions.map(time => <option key={time}>{time}</option>)}
                                 </select>
-                                <MaterialIcon name="expand_more" className="absolute right-3 bottom-3 text-gray-400 pointer-events-none" />
+                                <div className="absolute right-3 bottom-3 text-gray-400 pointer-events-none">
+                                   <ChevronDownIcon />
+                                </div>
                             </div>
                             <div className="relative">
                                 <label className="text-sm font-medium text-gray-400 mb-1 block">End Time</label>
                                 <select value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-full bg-[#1F2125] appearance-none rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50">
                                     {timeOptions.map(time => <option key={time}>{time}</option>)}
                                 </select>
-                                <MaterialIcon name="expand_more" className="absolute right-3 bottom-3 text-gray-400 pointer-events-none" />
+                                <div className="absolute right-3 bottom-3 text-gray-400 pointer-events-none">
+                                   <ChevronDownIcon />
+                                </div>
                             </div>
                         </div>
 
                          <div>
                             <div className="text-center text-sm text-gray-400 mb-2 flex items-center justify-center gap-2">
-                                <MaterialIcon name="schedule" className="!text-base" /> {duration}
+                                <ClockIcon className="w-4 h-4" colorClass="text-gray-400" /> {duration}
                             </div>
                             <label className="text-xs font-medium text-gray-500 mb-1 block text-center">Day's Schedule</label>
                             <div className="bg-[#1F2125] rounded-full h-3 relative overflow-hidden">
@@ -225,7 +233,7 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
                 <div className="px-4 py-3 flex-shrink-0 border-t border-slate-700/50">
                      {error && (
                         <div className="bg-red-900/50 border border-red-500/50 text-red-400 text-sm p-3 rounded-lg flex items-center gap-2 mb-3">
-                            <MaterialIcon name="error" className="!text-xl" />
+                            <ErrorIcon className="w-5 h-5" />
                             <span>{error}</span>
                         </div>
                     )}

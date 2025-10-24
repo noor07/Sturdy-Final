@@ -1,8 +1,5 @@
 import React from 'react';
-
-const MaterialIcon: React.FC<{ name: string, className?: string, onClick?: () => void }> = ({ name, className, onClick }) => (
-    <span className={`material-symbols-outlined ${className}`} onClick={onClick}>{name}</span>
-);
+import { FlashcardIcon } from './icons/Icons';
 
 interface FlashcardsScreenProps {
     onBack: () => void;
@@ -17,7 +14,7 @@ const FlashcardsScreen: React.FC<FlashcardsScreenProps> = ({ onBack }) => {
                 </header>
 
                 <main className="mt-20 flex flex-col items-center justify-center text-center">
-                    <MaterialIcon name="style" className="text-gray-500 !text-6xl" />
+                    <FlashcardIcon isActive={false} className="w-16 h-16 text-gray-500" />
                     <p className="text-gray-400 mt-4">The flashcards feature is coming soon!</p>
                      <button 
                         onClick={onBack}

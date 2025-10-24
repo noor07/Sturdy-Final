@@ -1,10 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { Subject, Note } from '../types';
-import { SearchIcon, BookIcon, CameraIcon, AddIcon, CloseIcon, TrashIcon } from './icons/Icons';
-
-const MaterialIcon: React.FC<{ name: string, className?: string }> = ({ name, className }) => (
-    <span className={`material-symbols-outlined ${className}`}>{name}</span>
-);
+import { SearchIcon, BookIcon, CameraIcon, AddIcon, CloseIcon, TrashIcon, NotesIcon, ChevronDownIcon } from './icons/Icons';
 
 interface NotesScreenProps {
     onBack: () => void;
@@ -187,7 +183,7 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                         className="w-14 h-14 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform"
                         aria-label="Create text note"
                     >
-                        <MaterialIcon name="description" className="!text-3xl" />
+                        <NotesIcon isActive className="!text-black w-8 h-8" />
                     </button>
                 </div>
 
@@ -234,7 +230,7 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                                 ))}
                             </select>
                             <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                                <MaterialIcon name="expand_more" className="text-gray-400" />
+                                <ChevronDownIcon className="text-gray-400" />
                             </div>
                         </div>
                         <textarea 
@@ -285,7 +281,7 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                                 ))}
                             </select>
                             <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                                <MaterialIcon name="expand_more" className="text-gray-400" />
+                                <ChevronDownIcon className="text-gray-400" />
                             </div>
                         </div>
                         

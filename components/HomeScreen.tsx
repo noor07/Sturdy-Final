@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Subject } from '../types';
 import { Avatars } from './icons/Avatars';
+import { SettingsIcon, EditIcon, ChevronDownIcon, ChevronUpIcon, PlayArrowIcon, CheckIcon, AddIcon, CloseIcon } from './icons/Icons';
 
 const CircularProgress: React.FC<{ progress: number, size?: number, strokeWidth?: number }> = ({ progress, size = 48, strokeWidth = 4 }) => {
   const radius = (size - strokeWidth) / 2;
@@ -39,10 +40,6 @@ const CircularProgress: React.FC<{ progress: number, size?: number, strokeWidth?
   );
 };
 
-const MaterialIcon: React.FC<{ name: string, className?: string, onClick?: () => void }> = ({ name, className, onClick }) => (
-    <span className={`material-symbols-outlined ${className}`} onClick={onClick}>{name}</span>
-);
-
 const AddItemInput: React.FC<{ onSave: (name: string) => void, onCancel: () => void, placeholder: string }> = ({ onSave, onCancel, placeholder }) => {
     const [name, setName] = useState('');
     
@@ -72,8 +69,8 @@ const AddItemInput: React.FC<{ onSave: (name: string) => void, onCancel: () => v
                 placeholder={placeholder}
                 className="bg-transparent focus:outline-none text-sm flex-1 placeholder-gray-500"
             />
-            <button onClick={handleSave} className="text-green-400"><MaterialIcon name="check" /></button>
-            <button onClick={onCancel} className="text-gray-400"><MaterialIcon name="close" /></button>
+            <button onClick={handleSave} className="text-green-400"><CheckIcon className="w-6 h-6" /></button>
+            <button onClick={onCancel} className="text-gray-400"><CloseIcon className="w-6 h-6" /></button>
         </div>
     );
 };
@@ -170,7 +167,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
             </div>
           </div>
           <button onClick={onNavigateToSettings} className="p-2 rounded-full hover:bg-white/10 transition-colors">
-            <MaterialIcon name="settings" className="text-gray-300" />
+            <SettingsIcon />
           </button>
         </header>
 
@@ -210,9 +207,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
                             <p className="text-sm text-gray-400">{subject.timeSpent}</p>
                         </div>
                         <div className="flex items-center gap-1">
-                             <button className="p-1 rounded-full hover:bg-white/10 transition-colors"><MaterialIcon name="edit" className="text-gray-400 !text-base" /></button>
+                             <button className="p-1 rounded-full hover:bg-white/10 transition-colors"><EditIcon className="w-4 h-4 text-gray-400" /></button>
                             <button onClick={() => toggleSubject(subject.id)} className="flex items-center text-gray-400 text-xs gap-1 hover:text-white transition-colors">
-                                Hide Details <MaterialIcon name={subject.isExpanded ? 'expand_less' : 'expand_more'} className="!text-lg" />
+                                Hide Details {subject.isExpanded ? <ChevronUpIcon className="w-5 h-5"/> : <ChevronDownIcon className="w-5 h-5"/>}
                             </button>
                         </div>
                     </div>
@@ -231,9 +228,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
                                             <h3 className="font-semibold">{topic.name}</h3>
                                         </div>
                                          <div className="flex items-center gap-1">
-                                            <button className="p-1 rounded-full hover:bg-white/10 transition-colors"><MaterialIcon name="edit" className="text-gray-400 !text-base" /></button>
+                                            <button className="p-1 rounded-full hover:bg-white/10 transition-colors"><EditIcon className="w-4 h-4 text-gray-400" /></button>
                                             <button onClick={() => toggleTopic(subject.id, topic.id)} className="flex items-center text-gray-400 text-xs gap-1 hover:text-white transition-colors">
-                                                 Hide Details <MaterialIcon name={topic.isExpanded ? 'expand_less' : 'expand_more'} className="!text-lg" />
+                                                 Hide Details {topic.isExpanded ? <ChevronUpIcon className="w-5 h-5"/> : <ChevronDownIcon className="w-5 h-5"/>}
                                             </button>
                                         </div>
                                    </div>
@@ -252,12 +249,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
                                                       </div>
                                                    </div>
                                                    <div className="flex items-center gap-2">
-                                                       <button className="p-1"><MaterialIcon name="edit" className="text-gray-400 !text-sm" /></button>
+                                                       <button className="p-1"><EditIcon className="w-4 h-4 text-gray-400" /></button>
                                                        <button className="bg-[#34D399] text-black rounded-full w-7 h-7 flex items-center justify-center">
-                                                          <MaterialIcon name="play_arrow" className="!text-xl" />
+                                                          <PlayArrowIcon className="w-5 h-5" />
                                                        </button>
                                                        <button className={`${subTopic.completed ? 'bg-[#34D399] text-black' : 'bg-gray-700 text-gray-500' } rounded-full w-7 h-7 flex items-center justify-center transition-colors`}>
-                                                          <MaterialIcon name="check" className="!text-lg" />
+                                                          <CheckIcon className="w-5 h-5 text-current" />
                                                        </button>
                                                    </div>
                                                </div>
@@ -270,7 +267,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
                                                 />
                                             ) : (
                                                 <button onClick={() => setAddingState({ type: 'subtopic', parentId: topic.id })} className="w-full flex items-center justify-center gap-2 text-center py-2 mt-2 text-sm text-gray-400 hover:text-white transition-colors border border-dashed border-gray-600 rounded-lg hover:border-gray-500">
-                                                    <MaterialIcon name="add" className="!text-base" /> Add Topic
+                                                    <AddIcon className="w-4 h-4" /> Add Topic
                                                 </button>
                                             )}
                                        </div>
@@ -292,7 +289,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
                                     boxShadow: '0 4px 15px rgba(168, 154, 255, 0.1)',
                                 }}
                                 className="w-full flex items-center justify-center gap-2 py-3 mt-2 text-sm font-semibold text-[#C6BEFF] rounded-xl hover:shadow-[#A89AFF]/20 hover:border-[#A89AFF]/50 transition-all duration-300">
-                                    <MaterialIcon name="add" className="!text-base" /> Add Chapter
+                                    <AddIcon className="w-4 h-4" /> Add Chapter
                                 </button>
                            )}
                        </div>

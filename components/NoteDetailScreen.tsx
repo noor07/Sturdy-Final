@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { Note, Subject } from '../types';
-import { CameraIcon, CloseIcon, AddIcon } from './icons/Icons';
-
-const MaterialIcon: React.FC<{ name: string, className?: string, onClick?: () => void }> = ({ name, className, onClick }) => (
-    <span className={`material-symbols-outlined ${className}`} onClick={onClick}>{name}</span>
-);
+import { CameraIcon, CloseIcon, AddIcon, ArrowBackIcon, EditIcon, ChevronDownIcon } from './icons/Icons';
 
 interface NoteDetailScreenProps {
     note: Note;
@@ -91,11 +87,11 @@ const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, subjects, onB
             <div className="p-4 max-w-md mx-auto">
                 <header className="flex items-center py-4 relative justify-between">
                     <button onClick={onBack} className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                        <MaterialIcon name="arrow_back_ios_new" className="text-gray-300 !text-xl" />
+                        <ArrowBackIcon className="text-gray-300 w-5 h-5" />
                     </button>
                     <h1 className="text-lg font-bold">Note Details</h1>
                     <button onClick={() => setIsEditing(true)} className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                        <MaterialIcon name="edit" className="text-gray-300 !text-xl" />
+                        <EditIcon className="text-gray-300 w-5 h-5" />
                     </button>
                 </header>
 
@@ -151,7 +147,7 @@ const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, subjects, onB
                                 ))}
                             </select>
                             <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                                <MaterialIcon name="expand_more" className="text-gray-400" />
+                                <ChevronDownIcon className="text-gray-400" />
                             </div>
                         </div>
 
