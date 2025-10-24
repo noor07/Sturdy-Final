@@ -42,8 +42,8 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
             const currentHour = currentTime.getHours();
             // Scroll to 2 hours before the current time, or top if it's early morning
             const scrollTargetHour = Math.max(0, currentHour - 2); 
-            // 7rem (h-28) per hour. 1rem is typically 16px.
-            const scrollTop = scrollTargetHour * 7 * 16;
+            // 14rem per hour. 1rem is typically 16px.
+            const scrollTop = scrollTargetHour * 14 * 16;
             setTimeout(() => {
               scrollContainerRef.current?.scrollTo({ top: scrollTop, behavior: 'auto' });
             }, 100); // Small delay to ensure layout is complete
@@ -146,10 +146,10 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
             </header>
 
             <main ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 mt-4 relative no-scrollbar">
-                <div className="relative h-[168rem]"> {/* 24 hours * 7rem (h-28) */}
+                <div className="relative h-[336rem]"> {/* 24 hours * 14rem */}
                     {/* 15-minute Grid Lines */}
                     {timeIntervals.map(({ label, styleClass }, index) => (
-                        <div key={index} className="flex items-start h-7"> {/* 1.75rem height for each 15-min slot */}
+                        <div key={index} className="flex items-start h-14"> {/* 3.5rem height for each 15-min slot */}
                             <div className="w-20 text-right pr-4"> {/* Increased width for time labels */}
                                 {index > 0 && <span className={`${styleClass} -translate-y-1/2 block`}>{label}</span>}
                             </div>
@@ -180,7 +180,7 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
                                 className="absolute left-[5.5rem] right-0 flex items-stretch"
                                 style={{
                                     top: `${top}%`,
-                                    height: `calc(${height}% - 2px)`,
+                                    height: `calc(${height}% - 4px)`,
                                 }}
                             >
                                 <div className="w-1.5 mr-2">
