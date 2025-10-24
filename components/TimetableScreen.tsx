@@ -16,8 +16,15 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
     const [currentTime, setCurrentTime] = useState(new Date());
 
     const selectedDateRef = useRef<HTMLButtonElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
 
+    const isSameDay = (d1: Date, d2: Date) => {
+        return d1.getFullYear() === d2.getFullYear() &&
+               d1.getMonth() === d2.getMonth() &&
+               d1.getDate() === d2.getDate();
+    };
+    
     useEffect(() => {
         const timerId = setInterval(() => setCurrentTime(new Date()), 1000 * 60); // Update every minute
         return () => clearInterval(timerId);
@@ -25,28 +32,24 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
 
     useLayoutEffect(() => {
         if (selectedDateRef.current) {
-            if (isInitialMount.current) {
-                // For the very first load, a small delay can help ensure the layout is fully computed
-                // before we try to scroll. This is a common workaround for tricky race conditions.
-                const timerId = setTimeout(() => {
-                    selectedDateRef.current?.scrollIntoView({
-                        behavior: 'auto',
-                        inline: 'center',
-                        block: 'nearest',
-                    });
-                }, 0);
-                isInitialMount.current = false;
-                return () => clearTimeout(timerId);
-            } else {
-                // For subsequent date selections, scroll smoothly without delay.
-                selectedDateRef.current.scrollIntoView({
-                    behavior: 'smooth',
-                    inline: 'center',
-                    block: 'nearest',
-                });
-            }
+            const behavior = isInitialMount.current ? 'auto' : 'smooth';
+            selectedDateRef.current.scrollIntoView({ behavior, inline: 'center', block: 'nearest' });
         }
     }, [selectedDate]);
+    
+    useEffect(() => {
+       if (isInitialMount.current && scrollContainerRef.current && isSameDay(selectedDate, new Date())) {
+            const currentHour = currentTime.getHours();
+            // Scroll to 2 hours before the current time, or top if it's early morning
+            const scrollTargetHour = Math.max(0, currentHour - 2); 
+            // 7rem (h-28) per hour. 1rem is typically 16px.
+            const scrollTop = scrollTargetHour * 7 * 16;
+            setTimeout(() => {
+              scrollContainerRef.current?.scrollTo({ top: scrollTop, behavior: 'auto' });
+            }, 100); // Small delay to ensure layout is complete
+        }
+        isInitialMount.current = false;
+    }, []); // This effect runs only once on mount
 
 
     const getDaysForScroller = () => {
@@ -61,12 +64,6 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
         return dates;
     };
 
-    const isSameDay = (d1: Date, d2: Date) => {
-        return d1.getFullYear() === d2.getFullYear() &&
-               d1.getMonth() === d2.getMonth() &&
-               d1.getDate() === d2.getDate();
-    };
-
     const hasEventsOnDay = (day: Date) => {
         return events.some(event => isSameDay(new Date(event.startTime), day));
     };
@@ -74,6 +71,15 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
     const handleSaveEvent = (newEventData: Omit<TimetableEvent, 'id'>) => {
       onAddEvent(newEventData);
     };
+    
+    const dateToMinutes = (date: Date) => date.getHours() * 60 + date.getMinutes();
+
+    const eventsForSelectedDay = events.filter(event => 
+        isSameDay(new Date(event.startTime), selectedDate)
+    );
+
+    const currentTimePosition = (dateToMinutes(currentTime) / (24 * 60)) * 100;
+    const isToday = isSameDay(currentTime, selectedDate);
 
     const days = getDaysForScroller();
     const hours = Array.from({ length: 24 }, (_, i) => {
@@ -124,18 +130,61 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
                 </div>
             </header>
 
-            <main className="flex-1 overflow-y-auto px-4 mt-4 relative no-scrollbar">
-                <div className="relative">
-                    {hours.map((hour) => (
-                        <div key={hour} className="flex items-start h-20">
+            <main ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 mt-4 relative no-scrollbar">
+                <div className="relative h-[168rem]"> {/* 24 hours * 7rem (h-28) */}
+                    {/* Hour Grid Lines */}
+                    {hours.map((hour, index) => (
+                        <div key={hour} className="flex items-start h-28">
                             <div className="w-16 text-right pr-4">
-                                <span className="text-xs text-gray-500">{hour}</span>
+                               {index > 0 && <span className="text-xs text-gray-500 -translate-y-1/2 block">{hour}</span>}
                             </div>
-                            <div className="flex-1 border-t border-gray-800 h-full">
-                                {/* Event blocks would be positioned absolutely within this container */}
-                            </div>
+                            <div className="flex-1 border-t border-gray-800 h-full"></div>
                         </div>
                     ))}
+
+                    {/* Current Time Indicator */}
+                    {isToday && (
+                        <div 
+                            className="absolute left-16 right-0 h-0.5 bg-red-400 z-10" 
+                            style={{ top: `${currentTimePosition}%` }}
+                        >
+                            <div className="absolute -left-1.5 -top-1 w-3 h-3 rounded-full bg-red-400 border-2 border-[#1F2125]"></div>
+                        </div>
+                    )}
+
+                    {/* Event Blocks */}
+                    {eventsForSelectedDay.map(event => {
+                        const start = new Date(event.startTime);
+                        const end = new Date(event.endTime);
+                        const top = (dateToMinutes(start) / (24 * 60)) * 100;
+                        const height = ((dateToMinutes(end) - dateToMinutes(start)) / (24 * 60)) * 100;
+
+                        return (
+                            <div
+                                key={event.id}
+                                className="absolute left-[4.5rem] right-0 flex items-stretch"
+                                style={{
+                                    top: `${top}%`,
+                                    height: `calc(${height}% - 2px)`,
+                                }}
+                            >
+                                <div className="w-1.5 mr-2">
+                                    <div className="h-full w-full rounded-full" style={{ backgroundColor: event.color }}></div>
+                                </div>
+                                <div className="flex-1 bg-[#2D2F34] rounded-lg p-2 overflow-hidden flex flex-col justify-center">
+                                     <p className="font-bold text-sm text-white drop-shadow-sm truncate">{event.title}</p>
+                                     <p className="text-xs text-white/80 drop-shadow-sm mt-0.5">
+                                        {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                                        {' - '}
+                                        {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                                    </p>
+                                    {event.description && (
+                                        <p className="text-xs text-white/60 drop-shadow-sm mt-1 truncate">{event.description}</p>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </main>
             
