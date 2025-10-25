@@ -21,7 +21,7 @@ const PersonalizationWelcome: React.FC<PersonalizationWelcomeProps> = ({ onReady
         <div className="mt-12">
           <button
             onClick={onReady}
-            className="w-full bg-white text-black font-bold py-4 px-4 rounded-full text-lg transition-transform transform hover:scale-105 shadow-lg shadow-white/20"
+            className="w-full bg-white text-black font-bold py-4 px-4 rounded-full text-lg transition-transform transform hover:scale-105 active:scale-100 shadow-lg shadow-white/20"
           >
             I'm Ready!
           </button>

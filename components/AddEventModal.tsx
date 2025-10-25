@@ -141,7 +141,7 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
                 {/* Header */}
                 <div className="flex justify-between items-center px-4 py-3 flex-shrink-0 border-b border-slate-700/50">
                     <h2 className="text-xl font-bold">Add Event</h2>
-                    <button onClick={onClose} className="p-1 rounded-full hover:bg-white/10">
+                    <button onClick={onClose} className="p-1 rounded-full hover:bg-white/10 transition-all duration-200 transform active:scale-90">
                         <CloseIcon className="w-6 h-6" />
                     </button>
                 </div>
@@ -168,7 +168,7 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
                             </label>
                             <div className="grid grid-cols-8 gap-1.5">
                                 {COLORS.map(color => (
-                                    <button key={color} onClick={() => setSelectedColor(color)} className="w-7 h-7 rounded-full flex items-center justify-center transition-transform transform hover:scale-110" style={{ backgroundColor: color }}>
+                                    <button key={color} onClick={() => setSelectedColor(color)} className="w-7 h-7 rounded-full flex items-center justify-center transition-transform transform hover:scale-110 active:scale-95" style={{ backgroundColor: color }}>
                                         {selectedColor === color && <CheckIcon className="text-white w-5 h-5" />}
                                     </button>
                                 ))}
@@ -237,7 +237,7 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
                             <span>{error}</span>
                         </div>
                     )}
-                    <button onClick={handleSave} className="w-full bg-[#A89AFF] text-black font-bold py-3 px-4 rounded-xl text-lg transition-all transform hover:scale-105 shadow-lg shadow-[#A89AFF]/30">
+                    <button onClick={handleSave} className="w-full bg-[#A89AFF] text-black font-bold py-3 px-4 rounded-xl text-lg transition-all transform hover:scale-105 active:scale-100 shadow-lg shadow-[#A89AFF]/30">
                         Save Event
                     </button>
                 </div>

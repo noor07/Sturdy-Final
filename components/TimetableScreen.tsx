@@ -131,7 +131,7 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
                                 key={day.toISOString()}
                                 ref={isSelected ? selectedDateRef : null}
                                 onClick={() => setSelectedDate(day)}
-                                className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300 w-16 h-20 flex-shrink-0
+                                className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300 w-16 h-20 flex-shrink-0 transform active:scale-95
                                     ${isSelected ? 'bg-[#A89AFF]' : 'hover:bg-white/10'}`}
                             >
                                 <span className={`font-bold text-xl ${isSelected ? 'text-black' : 'text-white'}`}>{day.getDate()}</span>
@@ -205,7 +205,7 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
             
             <button
                 onClick={() => setIsModalOpen(true)}
-                className="fixed bottom-24 right-6 w-12 h-12 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-xl transform hover:scale-110 transition-all duration-200 z-40"
+                className="fixed bottom-24 right-6 w-12 h-12 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-xl transform hover:scale-110 active:scale-100 transition-all duration-200 z-40"
                 aria-label="Add new event"
             >
                 <AddIcon className="w-6 h-6" />

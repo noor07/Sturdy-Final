@@ -126,7 +126,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
         <div className="bg-[#1F2125] min-h-screen text-white font-sans pb-28">
             <div className="p-4 max-w-md mx-auto">
                 <header className="flex items-center py-4 relative justify-center">
-                    <button onClick={handleBack} className="absolute left-0 p-2 rounded-full hover:bg-white/10 transition-colors">
+                    <button onClick={handleBack} className="absolute left-0 p-2 rounded-full hover:bg-white/10 transition-all duration-200 transform active:scale-90">
                         <ArrowBackIcon className="text-gray-300 w-5 h-5" />
                     </button>
                     <h1 className="text-lg font-bold">Settings</h1>
@@ -159,7 +159,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                             <hr className="border-slate-700" />
 
                             {/* Exam Goal */}
-                            <button onClick={() => setIsSelectingExamGoal(true)} className="flex items-center gap-4 w-full text-left">
+                            <button onClick={() => setIsSelectingExamGoal(true)} className="flex items-center gap-4 w-full text-left p-2 -m-2 rounded-lg transition-colors hover:bg-white/10">
                                <div className="bg-purple-500/20 p-2 rounded-lg">
                                     <GraduationCapIcon className="w-6 h-6 text-purple-400" />
                                </div>
@@ -179,7 +179,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                                 <div key={subject.id} className="flex items-center gap-3 bg-[#1F2125] p-3 rounded-lg">
                                     <div className="w-1 h-8 rounded-full" style={{ backgroundColor: subjectColors[index % subjectColors.length] }}></div>
                                     <p className="flex-1 font-medium">{subject.name}</p>
-                                    <button onClick={() => onDeleteSubject(subject.id)} className="p-2 text-gray-400 hover:text-red-400 transition-colors">
+                                    <button onClick={() => onDeleteSubject(subject.id)} className="p-2 text-gray-400 hover:text-red-400 transition-all transform hover:scale-110 active:scale-95">
                                         <TrashIcon />
                                     </button>
                                 </div>
@@ -193,7 +193,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                             ) : (
                                 <button
                                     onClick={() => setIsAddingSubject(true)} 
-                                    className="w-full flex items-center justify-center gap-2 py-3 mt-4 text-sm font-semibold text-white bg-[#1F2125] rounded-xl hover:bg-[#313338] transition-colors"
+                                    className="w-full flex items-center justify-center gap-2 py-3 mt-4 text-sm font-semibold text-white bg-[#1F2125] rounded-xl hover:bg-[#313338] transition-all transform active:scale-95"
                                 >
                                     <AddIcon className="w-4 h-4" /> Add Custom Subject
                                 </button>
@@ -222,7 +222,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                                             <button 
                                                 key={option} 
                                                 onClick={() => handleSelectExamGoal(option)} 
-                                                className="w-full bg-[#1F2125] p-4 rounded-xl text-left hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                                                className="w-full bg-[#1F2125] p-4 rounded-xl text-left hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transform hover:-translate-y-1"
                                             >
                                                 <span className="text-slate-200 font-medium">{option}</span>
                                             </button>
@@ -241,7 +241,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                     <button
                         onClick={handleSave}
                         disabled={showSavedMessage}
-                        className="w-full bg-[#A89AFF] disabled:bg-green-500 text-black font-bold py-3 px-4 rounded-full text-lg transition-all transform hover:scale-105 shadow-lg shadow-[#A89AFF]/30"
+                        className="w-full bg-[#A89AFF] disabled:bg-green-500 text-black font-bold py-3 px-4 rounded-full text-lg transition-all transform hover:scale-105 active:scale-100 shadow-lg shadow-[#A89AFF]/30"
                     >
                          {showSavedMessage ? (
                             <span className="flex items-center justify-center">

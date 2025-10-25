@@ -76,7 +76,7 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
                   <label className="text-sm font-medium text-slate-300 mb-2 block">Choose your avatar</label>
                   <div className="grid grid-cols-5 gap-3">
                     {Avatars.map((_, index) => (
-                      <button key={index} onClick={() => setUserData(prev => ({ ...prev, avatar: index }))} className={`rounded-full transition-all duration-200 aspect-square ${userData.avatar === index ? 'ring-2 ring-purple-400 scale-110' : 'opacity-70 hover:opacity-100'}`}>
+                      <button key={index} onClick={() => setUserData(prev => ({ ...prev, avatar: index }))} className={`rounded-full transition-all duration-200 aspect-square transform active:scale-95 ${userData.avatar === index ? 'ring-2 ring-purple-400 scale-110' : 'opacity-70 hover:opacity-100 hover:scale-105'}`}>
                         {React.createElement(Avatars[index], { className: 'w-full h-full' })}
                       </button>
                     ))}
@@ -114,7 +114,7 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
               </div>
             </div>
             <div className="pt-6 mt-auto">
-              <button onClick={handleNext} disabled={!userData.name} className="w-full bg-slate-200/90 text-slate-900 disabled:bg-slate-700 disabled:text-slate-500 font-bold py-3 px-4 rounded-xl transition-all hover:bg-white transform hover:scale-105">
+              <button onClick={handleNext} disabled={!userData.name} className="w-full bg-slate-200/90 text-slate-900 disabled:bg-slate-700 disabled:text-slate-500 font-bold py-3 px-4 rounded-xl transition-all hover:bg-white transform hover:scale-105 active:scale-100">
                 Next
               </button>
             </div>
@@ -132,7 +132,7 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
             <div className="space-y-3 overflow-y-auto">
               {isStep2 ? (
                 currentStatusOptions.map(option => (
-                  <button key={option} onClick={() => handleSelectOptionAndNext(field, option)} className="w-full glass-input p-4 rounded-xl text-left hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                  <button key={option} onClick={() => handleSelectOptionAndNext(field, option)} className="w-full glass-input p-4 rounded-xl text-left hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transform hover:-translate-y-1">
                     <span className="text-slate-200 font-medium">{option}</span>
                   </button>
                 ))
@@ -142,7 +142,7 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
                     <h2 className="text-sm font-semibold text-slate-400 my-3 px-1 uppercase tracking-wider">{category}</h2>
                     <div className="space-y-3">
                     {catOptions.map(option => (
-                      <button key={option} onClick={() => handleSelectOptionAndNext(field, option)} className="w-full glass-input p-4 rounded-xl text-left hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                      <button key={option} onClick={() => handleSelectOptionAndNext(field, option)} className="w-full glass-input p-4 rounded-xl text-left hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transform hover:-translate-y-1">
                         <span className="text-slate-200 font-medium">{option}</span>
                       </button>
                     ))}
@@ -166,7 +166,7 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
                   <button
                     key={option}
                     onClick={() => setUserData(prev => ({...prev, lessonTime: option}))}
-                    className={`w-full p-4 rounded-xl text-left transition-all duration-200 ring-1 focus:outline-none focus:ring-2 focus:ring-purple-400 ${
+                    className={`w-full p-4 rounded-xl text-left transition-all duration-200 ring-1 focus:outline-none focus:ring-2 focus:ring-purple-400 transform hover:-translate-y-1 ${
                       userData.lessonTime === option ? 'bg-purple-500/40 ring-purple-400' : 'glass-input ring-transparent hover:bg-white/20'
                     }`}
                   >
@@ -176,7 +176,7 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
               </div>
             </div>
             <div className="pt-6 mt-auto">
-              <button onClick={() => onComplete({ name: userData.name, avatar: userData.avatar })} className="w-full bg-white text-black font-bold py-4 px-4 rounded-full text-lg transition-transform transform hover:scale-105 shadow-lg shadow-white/20">
+              <button onClick={() => onComplete({ name: userData.name, avatar: userData.avatar })} className="w-full bg-white text-black font-bold py-4 px-4 rounded-full text-lg transition-transform transform hover:scale-105 active:scale-100 shadow-lg shadow-white/20">
                 Start Learning
               </button>
             </div>

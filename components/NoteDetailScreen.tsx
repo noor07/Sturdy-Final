@@ -86,11 +86,11 @@ const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, subjects, onB
         <div className="bg-[#1F2125] min-h-screen text-white font-sans">
             <div className="p-4 max-w-md mx-auto">
                 <header className="flex items-center py-4 relative justify-between">
-                    <button onClick={onBack} className="p-2 rounded-full hover:bg-white/10 transition-colors">
+                    <button onClick={onBack} className="p-2 rounded-full hover:bg-white/10 transition-all duration-200 transform active:scale-90">
                         <ArrowBackIcon className="text-gray-300 w-5 h-5" />
                     </button>
                     <h1 className="text-lg font-bold">Note Details</h1>
-                    <button onClick={() => setIsEditing(true)} className="p-2 rounded-full hover:bg-white/10 transition-colors">
+                    <button onClick={() => setIsEditing(true)} className="p-2 rounded-full hover:bg-white/10 transition-all duration-200 transform active:scale-90">
                         <EditIcon className="text-gray-300 w-5 h-5" />
                     </button>
                 </header>
@@ -184,7 +184,7 @@ const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, subjects, onB
                     </div>
                     <button
                         onClick={handleSaveChanges}
-                        className="w-full mt-6 bg-[#A89AFF] text-black font-bold py-3 px-4 rounded-xl text-lg transition-all transform hover:scale-105 shadow-lg shadow-[#A89AFF]/30"
+                        className="w-full mt-6 bg-[#A89AFF] text-black font-bold py-3 px-4 rounded-xl text-lg transition-all transform hover:scale-105 active:scale-100 shadow-lg shadow-[#A89AFF]/30"
                     >
                         Save Changes
                     </button>

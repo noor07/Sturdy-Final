@@ -133,7 +133,7 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                 ) : (
                     <main className="mt-6 space-y-4">
                         {filteredNotes.map(note => (
-                            <div key={note.id} className="bg-[#1F2125] p-4 rounded-xl border border-gray-800/50 shadow-sm transition-all duration-200 hover:border-gray-700">
+                            <div key={note.id} className="bg-[#1F2125] p-4 rounded-xl border border-gray-800/50 shadow-sm transition-all duration-200 hover:border-gray-700 transform hover:-translate-y-1">
                                 <button onClick={() => onSelectNote(note)} className="w-full text-left">
                                     <p className="text-sm text-green-400 font-semibold uppercase tracking-wider">{note.subjectName}</p>
                                     <h3 className="font-bold text-xl text-white mt-1 truncate">{note.title}</h3>
@@ -152,7 +152,7 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                                             e.stopPropagation();
                                             onDeleteNote(note.id);
                                         }} 
-                                        className="p-2 text-gray-500 hover:text-red-400 transition-colors rounded-full hover:bg-red-500/10"
+                                        className="p-2 text-gray-500 hover:text-red-400 transition-all duration-200 rounded-full hover:bg-red-500/10 transform active:scale-90"
                                         aria-label="Delete note"
                                     >
                                         <TrashIcon className="h-4 w-4" />
@@ -173,14 +173,14 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                 >
                      <button
                         onClick={handleOpenCreateImageNoteModal}
-                        className="w-10 h-10 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform"
+                        className="w-10 h-10 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-lg transform hover:scale-110 active:scale-95 transition-transform"
                         aria-label="Capture note with camera"
                     >
                         <CameraIcon className="w-5 h-5" />
                     </button>
                     <button
                         onClick={handleOpenCreateTextNoteModal}
-                        className="w-10 h-10 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform"
+                        className="w-10 h-10 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-lg transform hover:scale-110 active:scale-95 transition-transform"
                         aria-label="Create text note"
                     >
                         <NotesIcon isActive className="!text-black w-5 h-5" />
@@ -243,7 +243,7 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                     </div>
                     <button
                         onClick={handleSaveTextNote}
-                        className="w-full mt-6 bg-[#A89AFF] text-black font-bold py-3 px-4 rounded-xl text-lg transition-all transform hover:scale-105 shadow-lg shadow-[#A89AFF]/30"
+                        className="w-full mt-6 bg-[#A89AFF] text-black font-bold py-3 px-4 rounded-xl text-lg transition-all transform hover:scale-105 active:scale-100 shadow-lg shadow-[#A89AFF]/30"
                     >
                         Save Note
                     </button>
@@ -319,7 +319,7 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                     </div>
                     <button
                         onClick={handleSaveImageNote}
-                        className="w-full mt-6 bg-[#A89AFF] text-black font-bold py-3 px-4 rounded-xl text-lg transition-all transform hover:scale-105 shadow-lg shadow-[#A89AFF]/30"
+                        className="w-full mt-6 bg-[#A89AFF] text-black font-bold py-3 px-4 rounded-xl text-lg transition-all transform hover:scale-105 active:scale-100 shadow-lg shadow-[#A89AFF]/30"
                     >
                         Save Note
                     </button>

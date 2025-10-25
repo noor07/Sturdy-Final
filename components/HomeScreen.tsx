@@ -196,13 +196,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
               <p className="text-sm text-gray-400">{getGreeting()}</p>
             </div>
           </div>
-          <button onClick={onNavigateToSettings} className="p-2 rounded-full hover:bg-white/10 transition-colors">
+          <button onClick={onNavigateToSettings} className="p-2 rounded-full hover:bg-white/10 transition-all duration-200 transform active:scale-90">
             <SettingsIcon />
           </button>
         </header>
 
         {eventToShow && (
-            <div className="glass-card rounded-xl p-4 my-6 flex items-start gap-4">
+            <div className="glass-card rounded-xl p-4 my-6 flex items-start gap-4 transition-all duration-300 hover:shadow-lg hover:border-white/20 hover:-translate-y-1">
                 <div className="w-1.5 h-16 rounded-full flex-shrink-0" style={{ backgroundColor: eventToShow.color }}></div>
                 <div className="overflow-hidden">
                     <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: eventToShow.color }}>
@@ -222,7 +222,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
             {calendarDates.map(({day, date}) => (
                 <div key={date} 
                      onClick={() => setActiveDate(date)}
-                     className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300 w-14 h-14 cursor-pointer ${activeDate === date ? 'bg-[#A89AFF]' : 'hover:bg-white/10'}`}>
+                     className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300 w-14 h-14 cursor-pointer transform active:scale-95 ${activeDate === date ? 'bg-[#A89AFF]' : 'hover:bg-white/10'}`}>
                     <span className={`text-xs ${activeDate === date ? 'text-black' : 'text-gray-400'}`}>{day}</span>
                     <span className={`font-bold text-lg ${activeDate === date ? 'text-black' : 'text-white'}`}>{date}</span>
                 </div>
@@ -234,7 +234,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
                 <span className="text-xs text-gray-400">Filter</span>
                 <div className="flex gap-2 mt-1">
                     <button className="bg-[#A89AFF] text-black text-sm font-semibold py-1 px-3 rounded-md">All (11)</button>
-                    <button className="text-gray-400 hover:text-white text-sm font-semibold py-1 px-3">Due (6)</button>
+                    <button className="text-gray-400 hover:text-white text-sm font-semibold py-1 px-3 transition-colors duration-200">Due (6)</button>
                 </div>
             </div>
             <div className="text-right">
@@ -246,7 +246,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
         <main className="space-y-4">
             {subjects.map(subject => (
                 // Subject Card (e.g., "Science")
-                <div key={subject.id} className="bg-[#2D2F34] rounded-xl p-4 transition-all duration-300">
+                <div key={subject.id} className="bg-[#2D2F34] rounded-xl p-4 transition-all duration-300 hover:bg-[#313338] hover:shadow-lg">
                     <div className="flex items-start gap-3">
                         <CircularProgress progress={subject.progress} />
                         <div className="flex-1 mt-1">
@@ -268,7 +268,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
                        <div className="mt-4 space-y-3">
                            {subject.topics.map(topic => (
                                // Chapter Card (e.g., "Chemical Reactions and Equations"). This is a "Topic" in the code.
-                               <div key={topic.id} className="bg-[#1F2125] p-3 rounded-xl">
+                               <div key={topic.id} className="bg-[#1F2125] p-3 rounded-xl transition-colors duration-200 hover:bg-[#2a2d31]">
                                    <div className="flex items-start gap-3">
                                         <CircularProgress progress={topic.progress} size={40} />
                                         <div className="flex-1 mt-0.5">
@@ -296,11 +296,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
                                                       </div>
                                                    </div>
                                                    <div className="flex items-center gap-2">
-                                                       <button className="p-1"><EditIcon className="w-4 h-4 text-gray-400" /></button>
-                                                       <button className="bg-[#34D399] text-black rounded-full w-7 h-7 flex items-center justify-center">
+                                                       <button className="p-1 transform hover:scale-110 transition-transform"><EditIcon className="w-4 h-4 text-gray-400" /></button>
+                                                       <button className="bg-[#34D399] text-black rounded-full w-7 h-7 flex items-center justify-center transform hover:scale-110 transition-transform">
                                                           <PlayArrowIcon className="w-5 h-5" />
                                                        </button>
-                                                       <button className={`${subTopic.completed ? 'bg-[#34D399] text-black' : 'bg-gray-700 text-gray-500' } rounded-full w-7 h-7 flex items-center justify-center transition-colors`}>
+                                                       <button className={`${subTopic.completed ? 'bg-[#34D399] text-black' : 'bg-gray-700 text-gray-500' } rounded-full w-7 h-7 flex items-center justify-center transition-all transform hover:scale-110`}>
                                                           <CheckIcon className="w-5 h-5 text-current" />
                                                        </button>
                                                    </div>
@@ -335,7 +335,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
                                     border: '1px solid rgba(168, 154, 255, 0.3)',
                                     boxShadow: '0 4px 15px rgba(168, 154, 255, 0.1)',
                                 }}
-                                className="w-full flex items-center justify-center gap-2 py-3 mt-2 text-sm font-semibold text-[#C6BEFF] rounded-xl hover:shadow-[#A89AFF]/20 hover:border-[#A89AFF]/50 transition-all duration-300">
+                                className="w-full flex items-center justify-center gap-2 py-3 mt-2 text-sm font-semibold text-[#C6BEFF] rounded-xl hover:shadow-[#A89AFF]/20 hover:border-[#A89AFF]/50 transition-all duration-300 transform active:scale-95">
                                     <AddIcon className="w-4 h-4" /> Add Chapter
                                 </button>
                            )}

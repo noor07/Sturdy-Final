@@ -5,7 +5,7 @@ import { HomeIcon, FlashcardIcon, NotesIcon, TimetableIcon } from './icons/Icons
 const NavItem: React.FC<{ icon: React.ReactNode; label: string; isActive: boolean; onClick: () => void }> = ({ icon, label, isActive, onClick }) => (
   <button 
     onClick={onClick}
-    className={`flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-all duration-300 ${isActive ? 'bg-white/5' : 'hover:bg-white/10'}`}
+    className={`flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-all duration-300 transform active:scale-95 ${isActive ? 'bg-white/5' : 'hover:bg-white/10 hover:scale-105'}`}
   >
     {icon}
     <span className={`text-[10px] transition-colors ${isActive ? 'text-white' : 'text-gray-400'}`}>{label}</span>

@@ -47,7 +47,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                         </div>
                          <button
                             type="submit"
-                            className="w-full mt-6 bg-white text-black font-bold py-3 px-4 rounded-full transition-transform transform hover:scale-105 shadow-lg shadow-purple-500/20"
+                            className="w-full mt-6 bg-white text-black font-bold py-3 px-4 rounded-full transition-transform transform hover:scale-105 active:scale-100 shadow-lg shadow-purple-500/20"
                         >
                             {isSignUp ? 'Sign Up' : 'Sign In'}
                         </button>

@@ -18,7 +18,7 @@ const FlashcardsScreen: React.FC<FlashcardsScreenProps> = ({ onBack }) => {
                     <p className="text-gray-400 mt-4">The flashcards feature is coming soon!</p>
                      <button 
                         onClick={onBack}
-                        className="mt-6 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
+                        className="mt-6 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 text-sm transform hover:scale-105 active:scale-100"
                     >
                         Go to Home
                     </button>
