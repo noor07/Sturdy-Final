@@ -62,3 +62,17 @@ export interface TimetableEvent {
   color: string;
   repeats?: string;
 }
+
+// New type for Flashcards
+export interface Flashcard {
+  question: string;
+  answer: string;
+}
+
+export interface FlashcardSet {
+  topicId: string;
+  topicName: string;
+  subjectName: string;
+  cards: Flashcard[];
+  score: number;
+}

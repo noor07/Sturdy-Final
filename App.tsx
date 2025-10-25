@@ -9,7 +9,8 @@ import NotesScreen from './components/NotesScreen';
 import TimetableScreen from './components/TimetableScreen';
 import BottomNavBar from './components/BottomNavBar';
 import NoteDetailScreen from './components/NoteDetailScreen';
-import type { Subject, Note, TimetableEvent } from './types';
+import type { Subject, Note, TimetableEvent, FlashcardSet, Flashcard } from './types';
+import { generateFlashcards as generateFlashcardsFromAPI } from './services/geminiService';
 
 // Moved from HomeScreen so it can be shared with SettingsScreen
 const MOCK_DATA: Subject[] = [
@@ -89,6 +90,7 @@ const App: React.FC = () => {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [timetableEvents, setTimetableEvents] = useState<TimetableEvent[]>(MOCK_EVENTS);
   const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
+  const [flashcardSets, setFlashcardSets] = useState<Record<string, FlashcardSet>>({});
 
 
   const handleLogin = () => {
@@ -154,6 +156,37 @@ const App: React.FC = () => {
     setIsAddEventModalOpen(false);
   };
 
+  const handleGenerateFlashcards = async (topicId: string, topicName: string, subjectName: string) => {
+      const existingSet = flashcardSets[topicId];
+      const existingQuestions = existingSet ? existingSet.cards.map(c => c.question) : [];
+      
+      const newCards = await generateFlashcardsFromAPI(topicName, existingQuestions);
+      
+      setFlashcardSets(prevSets => {
+          const updatedSet = {
+              topicId,
+              topicName,
+              subjectName,
+              score: existingSet?.score || 0,
+              cards: [...(existingSet?.cards || []), ...newCards],
+          };
+          return { ...prevSets, [topicId]: updatedSet };
+      });
+  };
+
+  const handleUpdateFlashcardScore = (topicId: string, pointsToAdd: number) => {
+      setFlashcardSets(prevSets => {
+          const existingSet = prevSets[topicId];
+          if (existingSet) {
+              return {
+                  ...prevSets,
+                  [topicId]: { ...existingSet, score: existingSet.score + pointsToAdd }
+              };
+          }
+          return prevSets;
+      });
+  };
+
 
   const renderScreen = () => {
     if (selectedNote) {
@@ -188,7 +221,12 @@ const App: React.FC = () => {
                 setSubjects={setSubjects} // Pass setter for reverting changes
             />
         case 'flashcards':
-            return <FlashcardsScreen onBack={() => setCurrentScreen('home')} />;
+            return <FlashcardsScreen 
+                subjects={subjects}
+                flashcardSets={flashcardSets}
+                onGenerate={handleGenerateFlashcards}
+                onUpdateScore={handleUpdateFlashcardScore}
+            />;
         case 'notes':
             return <NotesScreen 
                 onBack={() => setCurrentScreen('home')} 

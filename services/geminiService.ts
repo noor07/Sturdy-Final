@@ -71,3 +71,50 @@ export async function generateQuiz(topic: string): Promise<any> {
         throw new Error("Failed to generate quiz from Gemini API.");
     }
 }
+
+export async function generateFlashcards(topic: string, existingQuestions: string[]): Promise<any> {
+    const prompt = `Create a set of 50 flashcards for the topic: "${topic}".
+Each flashcard must have a 'question' and a concise 'answer'.
+The questions should cover key concepts of the topic, suitable for someone studying for an exam.
+IMPORTANT: Do not generate any questions from the following list, they have already been created: ${existingQuestions.join('; ')}`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-pro",
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        flashcards: {
+                            type: Type.ARRAY,
+                            description: "An array of 50 flashcard objects.",
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    question: {
+                                        type: Type.STRING,
+                                        description: "The question for the flashcard.",
+                                    },
+                                    answer: {
+                                        type: Type.STRING,
+                                        description: "The concise answer to the question.",
+                                    }
+                                },
+                                required: ["question", "answer"]
+                            }
+                        }
+                    },
+                    required: ["flashcards"]
+                },
+            },
+        });
+
+        const jsonResponse = JSON.parse(response.text);
+        return jsonResponse.flashcards;
+    } catch (error) {
+        console.error("Gemini API call failed for flashcards:", error);
+        throw new Error("Failed to generate flashcards from Gemini API.");
+    }
+}

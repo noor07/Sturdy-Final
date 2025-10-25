@@ -210,3 +210,38 @@ export const ErrorIcon: React.FC<{ className?: string }> = ({ className = 'h-6 w
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
     </svg>
 );
+
+export const ReplayIcon: React.FC<{ className?: string }> = ({ className = 'h-6 w-6' }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h6M7 8h6" />
+    </svg>
+);
+
+export const FlashcardCheckIcon: React.FC<{ className?: string }> = ({ className = 'h-8 w-8' }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+);
+
+export const FlashcardXIcon: React.FC<{ className?: string }> = ({ className = 'h-8 w-8' }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+);
+
+export const ShuffleIcon: React.FC<{ className?: string }> = ({ className = 'h-6 w-6' }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 0-2.5 4-2.5-4-7 0" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 15l-7 0-2.5-4-2.5 4-7 0" />
+    </svg>
+);
+
+export const TrophyIcon: React.FC<{ className?: string }> = ({ className = 'h-6 w-6' }) => (
+     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M11.9999 21C11.9999 21 15.9999 18.5 15.9999 13V6H7.99988V13C7.99988 18.5 11.9999 21 11.9999 21Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 9H3V11H6" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M18 9H21V11H18" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V3" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 3H15" />
+    </svg>
+);
