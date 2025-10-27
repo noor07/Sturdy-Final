@@ -1,6 +1,5 @@
-import React, { useState, useMemo, FC } from 'react';
+import React, { useState, useMemo, FC, useRef, useEffect } from 'react';
 import type { TimetableEvent } from '../types';
-// FIX: Imported CheckIcon to resolve 'Cannot find name' error.
 import { CloseIcon, EditIcon, NotesIcon, SellIcon, ChevronDownIcon, ClockIcon, ErrorIcon, CheckIcon } from './icons/Icons';
 
 const COLORS = [
@@ -25,10 +24,61 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [selectedColor, setSelectedColor] = useState(COLORS[0]);
-    const [repeats, setRepeats] = useState('Does not repeat');
     const [startTime, setStartTime] = useState('12:00 PM');
     const [endTime, setEndTime] = useState('1:00 PM');
     const [error, setError] = useState<string | null>(null);
+
+    const [isRepeatDropdownOpen, setIsRepeatDropdownOpen] = useState(false);
+    const [selectedDays, setSelectedDays] = useState<string[]>([]);
+    const [isAllDays, setIsAllDays] = useState(false);
+    const repeatDropdownRef = useRef<HTMLDivElement>(null);
+
+    const daysOfWeek = useMemo(() => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], []);
+
+    const handleDayToggle = (day: string) => {
+        if (isAllDays) return;
+        
+        const newSelectedDays = selectedDays.includes(day)
+            ? selectedDays.filter(d => d !== day)
+            : [...selectedDays, day];
+        
+        setSelectedDays(newSelectedDays.sort((a, b) => daysOfWeek.indexOf(a) - daysOfWeek.indexOf(b)));
+    };
+
+    const handleAllDaysToggle = () => {
+        const newIsAllDays = !isAllDays;
+        setIsAllDays(newIsAllDays);
+        if (newIsAllDays) {
+            setSelectedDays(daysOfWeek);
+        } else {
+            setSelectedDays([]);
+        }
+    };
+    
+    useEffect(() => {
+        if (!isAllDays && selectedDays.length === 7) {
+            setIsAllDays(true);
+        }
+    }, [selectedDays, isAllDays]);
+
+
+    const getRepeatDisplayValue = () => {
+        if (isAllDays) return 'Daily';
+        if (selectedDays.length === 0) return 'Does not repeat';
+        return selectedDays.map(d => d.substring(0, 3)).join(', ');
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (repeatDropdownRef.current && !repeatDropdownRef.current.contains(event.target as Node)) {
+                setIsRepeatDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [repeatDropdownRef]);
     
     const timeToMinutes = (timeStr: string) => {
         const [time, modifier] = timeStr.split(' ');
@@ -125,11 +175,17 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
             return;
         }
         
+        const getRepeatsString = () => {
+            if (isAllDays) return 'Daily';
+            if (selectedDays.length === 0) return 'Does not repeat';
+            return selectedDays.join(', ');
+        };
+        
         onSave({
             title,
             description,
             color: selectedColor,
-            repeats,
+            repeats: getRepeatsString(),
             startTime: newEventStartTime,
             endTime: newEventEndTime,
         });
@@ -175,17 +231,41 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
                             </div>
                         </div>
 
-                        <div className="relative">
-                             <label className="text-sm font-medium text-gray-400 mb-1 block">Repeats</label>
-                             <select value={repeats} onChange={(e) => setRepeats(e.target.value)} className="w-full bg-[#1F2125] appearance-none rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50">
-                                <option>Does not repeat</option>
-                                <option>Daily</option>
-                                <option>Weekly</option>
-                                <option>Monthly</option>
-                             </select>
-                             <div className="absolute right-3 bottom-3 text-gray-400 pointer-events-none">
+                         <div className="relative" ref={repeatDropdownRef}>
+                            <label className="text-sm font-medium text-gray-400 mb-1 block">Repeats</label>
+                            <button onClick={() => setIsRepeatDropdownOpen(prev => !prev)} className="w-full bg-[#1F2125] text-left appearance-none rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50 flex justify-between items-center">
+                                <span>{getRepeatDisplayValue()}</span>
                                 <ChevronDownIcon />
-                             </div>
+                            </button>
+                            {isRepeatDropdownOpen && (
+                                <div className="absolute z-10 top-full mt-1 w-full bg-[#3a3d42] rounded-lg p-3 shadow-lg border border-slate-600">
+                                    <label className="flex items-center space-x-3 p-2 rounded hover:bg-slate-600/50 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={isAllDays}
+                                            onChange={handleAllDaysToggle}
+                                            className="h-5 w-5 bg-slate-700 border-slate-500 rounded text-[#A89AFF] focus:ring-2 focus:ring-offset-0 focus:ring-offset-transparent focus:ring-[#A89AFF]/50"
+                                        />
+                                        <span className="font-semibold">All the days</span>
+                                    </label>
+                                    <hr className="border-slate-500 my-2"/>
+                                    <div className="space-y-1">
+                                        {daysOfWeek.map(day => (
+                                            <label key={day} className={`flex items-center space-x-3 p-2 rounded ${isAllDays ? 'cursor-not-allowed opacity-50' : 'hover:bg-slate-600/50 cursor-pointer'}`}>
+                                                <input
+                                                    type="checkbox"
+                                                    name={day}
+                                                    checked={selectedDays.includes(day)}
+                                                    onChange={() => handleDayToggle(day)}
+                                                    disabled={isAllDays}
+                                                    className="h-5 w-5 bg-slate-700 border-slate-500 rounded text-[#A89AFF] focus:ring-2 focus:ring-offset-0 focus:ring-offset-transparent focus:ring-[#A89AFF]/50"
+                                                />
+                                                <span>{day}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
