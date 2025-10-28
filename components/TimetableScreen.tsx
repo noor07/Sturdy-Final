@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect, useMemo } from 'react';
 import type { TimetableEvent } from '../types';
 import { AddIcon } from './icons/Icons';
 import AddEventModal from './AddEventModal';
@@ -64,8 +64,34 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
         return dates;
     };
 
+    const startOfDay = (date: Date) => {
+        const newDate = new Date(date);
+        newDate.setHours(0, 0, 0, 0);
+        return newDate;
+    };
+
     const hasEventsOnDay = (day: Date) => {
-        return events.some(event => isSameDay(new Date(event.startTime), day));
+        const dayOfWeek = day.toLocaleDateString('en-US', { weekday: 'long' });
+        const startOfGivenDay = startOfDay(day);
+
+        return events.some(event => {
+            const originalStartDate = new Date(event.startTime);
+            const startOfOriginalDate = startOfDay(originalStartDate);
+
+            // Check if it's the original day of the event
+            if (isSameDay(originalStartDate, day)) {
+                return true;
+            }
+
+            // Check for repeating events, ensuring we don't show them before they start
+            if (event.repeats && event.repeats !== 'Does not repeat' && startOfGivenDay.getTime() >= startOfOriginalDate.getTime()) {
+                if (event.repeats === 'Daily') return true;
+                const repeatDays = event.repeats.split(', ');
+                if (repeatDays.includes(dayOfWeek)) return true;
+            }
+            
+            return false;
+        });
     };
 
     const handleSaveEvent = (newEventData: Omit<TimetableEvent, 'id'>) => {
@@ -74,9 +100,55 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
     
     const dateToMinutes = (date: Date) => date.getHours() * 60 + date.getMinutes();
 
-    const eventsForSelectedDay = events.filter(event => 
-        isSameDay(new Date(event.startTime), selectedDate)
-    );
+    const eventsForSelectedDay = useMemo(() => {
+        const resultingEvents: TimetableEvent[] = [];
+        const selectedDayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
+        const selectedDateStart = startOfDay(selectedDate);
+
+        for (const event of events) {
+            const originalStartDate = new Date(event.startTime);
+            const originalStartDateStart = startOfDay(originalStartDate);
+            
+            // Handle non-repeating events
+            if (!event.repeats || event.repeats === 'Does not repeat') {
+                if (isSameDay(originalStartDate, selectedDate)) {
+                    resultingEvents.push(event);
+                }
+                continue; // Move to next event
+            }
+            
+            // Handle repeating events
+            let shouldDisplay = false;
+            if (event.repeats === 'Daily') {
+                shouldDisplay = true;
+            } else {
+                const repeatDays = event.repeats.split(', ');
+                if (repeatDays.includes(selectedDayOfWeek)) {
+                    shouldDisplay = true;
+                }
+            }
+
+            // Ensure we don't show repeating events before their original start date
+            if (shouldDisplay && selectedDateStart.getTime() >= originalStartDateStart.getTime()) {
+                // Create a virtual event for the selected day
+                const newStartTime = new Date(selectedDate);
+                newStartTime.setHours(originalStartDate.getHours(), originalStartDate.getMinutes(), originalStartDate.getSeconds(), originalStartDate.getMilliseconds());
+
+                const originalEndTime = new Date(event.endTime);
+                const newEndTime = new Date(selectedDate);
+                newEndTime.setHours(originalEndTime.getHours(), originalEndTime.getMinutes(), originalEndTime.getSeconds(), originalEndTime.getMilliseconds());
+
+                resultingEvents.push({
+                    ...event,
+                    id: `${event.id}-${selectedDate.toISOString().split('T')[0]}`, // Create a unique key for this instance
+                    startTime: newStartTime.toISOString(),
+                    endTime: newEndTime.toISOString(),
+                });
+            }
+        }
+        return resultingEvents;
+    }, [events, selectedDate]);
+
 
     const currentTimePosition = (dateToMinutes(currentTime) / (24 * 60)) * 100;
     const isToday = isSameDay(currentTime, selectedDate);
@@ -219,16 +291,6 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
                     events={events}
                 />
             )}
-
-            <style>{`
-                .no-scrollbar::-webkit-scrollbar {
-                    display: none;
-                }
-                .no-scrollbar {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-            `}</style>
         </div>
     );
 };

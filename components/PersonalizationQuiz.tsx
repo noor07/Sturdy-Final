@@ -188,7 +188,7 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
   };
 
   return (
-    <div className="min-h-screen bg-[#1A1C20] text-white p-4 flex flex-col">
+    <div className="h-screen bg-[#1A1C20] text-white p-4 flex flex-col">
        <div className="w-full bg-white/10 rounded-full h-1.5 mb-6 mt-2">
         <div
           className="bg-white h-1.5 rounded-full transition-all duration-500 ease-in-out"

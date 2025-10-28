@@ -275,7 +275,7 @@ const App: React.FC = () => {
 
 
   return (
-    <div className="bg-[#1F2125] min-h-screen">
+    <div className="bg-[#1F2125] h-screen overflow-hidden">
         {renderScreen()}
         {showNavBar && (
             <BottomNavBar 

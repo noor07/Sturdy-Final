@@ -14,7 +14,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     };
 
     return (
-        <div className="min-h-screen bg-[#1A1C20] text-white flex flex-col items-center justify-center p-4 overflow-hidden">
+        <div className="h-screen bg-[#1A1C20] text-white flex flex-col items-center justify-center p-4 overflow-hidden">
             <div className="absolute top-0 left-0 w-72 h-72 bg-purple-600/30 rounded-full filter blur-3xl opacity-50 animate-blob"></div>
             <div className="absolute top-0 right-0 w-72 h-72 bg-cyan-600/30 rounded-full filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
             <div className="absolute bottom-0 left-1/2 w-72 h-72 bg-pink-600/30 rounded-full filter blur-3xl opacity-50 animate-blob animation-delay-4000"></div>

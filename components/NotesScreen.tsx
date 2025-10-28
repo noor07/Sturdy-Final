@@ -107,8 +107,8 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
 
     return (
         <>
-        <div className="bg-[#2D2F34] min-h-screen text-white font-sans pb-32 relative">
-            <div className="p-4 max-w-md mx-auto">
+        <div className="bg-[#2D2F34] h-screen text-white font-sans relative">
+            <div className="p-4 max-w-md mx-auto h-full overflow-y-auto no-scrollbar pb-32">
                 <header className="py-4">
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

@@ -259,7 +259,7 @@ const FlashcardsScreen: React.FC<FlashcardsScreenProps> = ({ subjects, flashcard
     };
 
     return (
-        <div className="bg-[#1F2125] min-h-screen text-white font-sans flex flex-col">
+        <div className="bg-[#1F2125] h-screen text-white font-sans flex flex-col">
             <div className="p-4 max-w-md mx-auto flex-grow w-full">
                 <header className="flex items-center py-4 relative justify-center">
                     <h1 className="text-lg font-bold">Flashcards</h1>

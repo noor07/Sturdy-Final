@@ -6,7 +6,7 @@ interface PersonalizationWelcomeProps {
 
 const PersonalizationWelcome: React.FC<PersonalizationWelcomeProps> = ({ onReady }) => {
   return (
-    <div className="min-h-screen bg-[#1A1C20] text-white flex flex-col justify-center items-center p-8 relative overflow-hidden">
+    <div className="h-screen bg-[#1A1C20] text-white flex flex-col justify-center items-center p-8 relative overflow-hidden">
       {/* Decorative shapes */}
       <div className="absolute -top-12 -left-24 w-64 h-64 bg-purple-600/30 rounded-full filter blur-3xl opacity-50 animate-blob"></div>
       <div className="absolute -bottom-20 -right-20 w-72 h-72 bg-yellow-500/20 rounded-full filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>

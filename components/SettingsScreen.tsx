@@ -123,8 +123,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
 
     return (
-        <div className="bg-[#1F2125] min-h-screen text-white font-sans pb-28">
-            <div className="p-4 max-w-md mx-auto">
+        <div className="bg-[#1F2125] h-screen text-white font-sans">
+            <div className="p-4 max-w-md mx-auto h-full overflow-y-auto no-scrollbar pb-28">
                 <header className="flex items-center py-4 relative justify-center">
                     <button onClick={handleBack} className="absolute left-0 p-2 rounded-full hover:bg-white/10 transition-all duration-200 transform active:scale-90">
                         <ArrowBackIcon className="text-gray-300 w-5 h-5" />
