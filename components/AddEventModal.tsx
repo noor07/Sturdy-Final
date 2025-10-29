@@ -1,6 +1,6 @@
 import React, { useState, useMemo, FC, useRef, useEffect } from 'react';
 import type { TimetableEvent } from '../types';
-import { CloseIcon, EditIcon, NotesIcon, SellIcon, ChevronDownIcon, ClockIcon, ErrorIcon, CheckIcon } from './icons/Icons';
+import { CloseIcon, EditIcon, NotesIcon, SellIcon, ChevronDownIcon, ClockIcon, ErrorIcon, CheckIcon, TrashIcon } from './icons/Icons';
 
 const COLORS = [
     '#F87171', '#34D399', '#60A5FA', '#FBBF24', '#F9A8D4', '#F472B6', '#FB923C', '#A78BFA',
@@ -16,11 +16,13 @@ const timeOptions = Array.from({ length: 48 }, (_, i) => {
 interface AddEventModalProps {
     onClose: () => void;
     onSave: (event: Omit<TimetableEvent, 'id'>) => void;
+    onDelete: (eventId: string) => void;
     selectedDate: Date;
     events: TimetableEvent[];
+    eventToEdit: TimetableEvent | null;
 }
 
-const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, events }) => {
+const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, onDelete, selectedDate, events, eventToEdit }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [selectedColor, setSelectedColor] = useState(COLORS[0]);
@@ -33,7 +35,40 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
     const [isAllDays, setIsAllDays] = useState(false);
     const repeatDropdownRef = useRef<HTMLDivElement>(null);
 
+    const isEditMode = !!eventToEdit;
     const daysOfWeek = useMemo(() => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], []);
+
+    useEffect(() => {
+        if (eventToEdit) {
+            setTitle(eventToEdit.title);
+            setDescription(eventToEdit.description || '');
+            setSelectedColor(eventToEdit.color);
+            setStartTime(new Date(eventToEdit.startTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }));
+            setEndTime(new Date(eventToEdit.endTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }));
+            
+            const repeats = eventToEdit.repeats || 'Does not repeat';
+            if (repeats === 'Daily') {
+                setIsAllDays(true);
+                setSelectedDays(daysOfWeek);
+            } else if (repeats === 'Does not repeat') {
+                setIsAllDays(false);
+                setSelectedDays([]);
+            } else {
+                setIsAllDays(false);
+                setSelectedDays(repeats.split(', '));
+            }
+        } else {
+            // Reset state for "add new" mode if needed, though this is primarily for edit
+            setTitle('');
+            setDescription('');
+            setSelectedColor(COLORS[0]);
+            setStartTime('12:00 PM');
+            setEndTime('1:00 PM');
+            setSelectedDays([]);
+            setIsAllDays(false);
+        }
+    }, [eventToEdit, daysOfWeek]);
+
 
     const handleDayToggle = (day: string) => {
         if (isAllDays) return;
@@ -58,6 +93,8 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
     useEffect(() => {
         if (!isAllDays && selectedDays.length === 7) {
             setIsAllDays(true);
+        } else if (isAllDays && selectedDays.length < 7) {
+            setIsAllDays(false);
         }
     }, [selectedDays, isAllDays]);
 
@@ -141,13 +178,11 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
     const handleSave = () => {
         setError(null); // Clear previous errors
 
-        // 1. Title validation
         if (!title.trim()) {
             setError('Please enter an event title.');
             return;
         }
 
-        // 2. Duration validation
         const startMinutes = timeToMinutes(startTime);
         const endMinutes = timeToMinutes(endTime);
         if (endMinutes <= startMinutes) {
@@ -158,9 +193,14 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
         const newEventStartTime = combineDateAndTime(selectedDate, startTime);
         const newEventEndTime = combineDateAndTime(selectedDate, endTime);
 
-        // 3. Overlap validation
-        const eventsOnSelectedDay = events.filter(event => isSameDay(new Date(event.startTime), selectedDate));
-        
+        const eventsOnSelectedDay = events.filter(event => {
+            const isSame = isSameDay(new Date(event.startTime), selectedDate);
+            if (isEditMode && event.id === eventToEdit.id) {
+                return false; // Exclude the event being edited from the check
+            }
+            return isSame;
+        });
+
         const isOverlapping = eventsOnSelectedDay.some(existingEvent => {
             const existingStart = new Date(existingEvent.startTime).getTime();
             const existingEnd = new Date(existingEvent.endTime).getTime();
@@ -190,13 +230,20 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
             endTime: newEventEndTime,
         });
     };
+    
+    const handleDelete = () => {
+        if (eventToEdit && window.confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
+            onDelete(eventToEdit.id);
+        }
+    };
+
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
             <div className="bg-[#2D2F34] w-full max-w-sm rounded-2xl shadow-2xl text-white flex flex-col max-h-[85vh] animate-fade-in">
                 {/* Header */}
                 <div className="flex justify-between items-center px-4 py-3 flex-shrink-0 border-b border-slate-700/50">
-                    <h2 className="text-xl font-bold">Add Event</h2>
+                    <h2 className="text-xl font-bold">{isEditMode ? 'Edit Event' : 'Add Event'}</h2>
                     <button onClick={onClose} className="p-1 rounded-full hover:bg-white/10 transition-all duration-200 transform active:scale-90">
                         <CloseIcon className="w-6 h-6" />
                     </button>
@@ -317,9 +364,20 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, selectedDate, 
                             <span>{error}</span>
                         </div>
                     )}
-                    <button onClick={handleSave} className="w-full bg-[#A89AFF] text-black font-bold py-3 px-4 rounded-xl text-lg transition-all transform hover:scale-105 active:scale-100 shadow-lg shadow-[#A89AFF]/30">
-                        Save Event
-                    </button>
+                     <div className="flex items-center gap-3">
+                        {isEditMode && (
+                            <button
+                                onClick={handleDelete}
+                                className="p-3 bg-red-900/70 text-red-400 rounded-xl transition-all hover:bg-red-800/70 transform active:scale-95"
+                                aria-label="Delete event"
+                            >
+                                <TrashIcon className="w-6 h-6" />
+                            </button>
+                        )}
+                        <button onClick={handleSave} className="w-full bg-[#A89AFF] text-black font-bold py-3 px-4 rounded-xl text-lg transition-all transform hover:scale-105 active:scale-100 shadow-lg shadow-[#A89AFF]/30">
+                            {isEditMode ? 'Update Event' : 'Save Event'}
+                        </button>
+                    </div>
                 </div>
             </div>
              <style>{`

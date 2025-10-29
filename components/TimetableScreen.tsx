@@ -7,13 +7,16 @@ interface TimetableScreenProps {
     onBack: () => void;
     events: TimetableEvent[];
     onAddEvent: (event: Omit<TimetableEvent, 'id'>) => void;
+    onUpdateEvent: (eventId: string, updatedData: Partial<Omit<TimetableEvent, 'id'>>) => void;
+    onDeleteEvent: (eventId: string) => void;
     isModalOpen: boolean;
     setIsModalOpen: (isOpen: boolean) => void;
 }
 
-const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAddEvent, isModalOpen, setIsModalOpen }) => {
+const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAddEvent, onUpdateEvent, onDeleteEvent, isModalOpen, setIsModalOpen }) => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [editingEvent, setEditingEvent] = useState<TimetableEvent | null>(null);
 
     const selectedDateRef = useRef<HTMLButtonElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -93,11 +96,23 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
             return false;
         });
     };
-
-    const handleSaveEvent = (newEventData: Omit<TimetableEvent, 'id'>) => {
-      onAddEvent(newEventData);
-    };
     
+    const handleSaveFromModal = (eventData: Omit<TimetableEvent, 'id'>) => {
+        if (editingEvent) {
+            onUpdateEvent(editingEvent.id, eventData);
+        } else {
+            onAddEvent(eventData);
+        }
+        setIsModalOpen(false);
+        setEditingEvent(null);
+    };
+
+    const handleDeleteFromModal = (eventId: string) => {
+        onDeleteEvent(eventId);
+        setIsModalOpen(false);
+        setEditingEvent(null);
+    };
+
     const dateToMinutes = (date: Date) => date.getHours() * 60 + date.getMinutes();
 
     const eventsForSelectedDay = useMemo(() => {
@@ -140,6 +155,7 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
 
                 resultingEvents.push({
                     ...event,
+                    originalId: event.id, // Keep track of the original event ID
                     id: `${event.id}-${selectedDate.toISOString().split('T')[0]}`, // Create a unique key for this instance
                     startTime: newStartTime.toISOString(),
                     endTime: newEndTime.toISOString(),
@@ -247,9 +263,16 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
                         const height = ((dateToMinutes(end) - dateToMinutes(start)) / (24 * 60)) * 100;
 
                         return (
-                            <div
+                            <button
                                 key={event.id}
-                                className="absolute left-[5.5rem] right-0 flex items-stretch"
+                                onClick={() => {
+                                    const originalEvent = events.find(e => e.id === (event.originalId || event.id));
+                                    if (originalEvent) {
+                                        setEditingEvent(originalEvent);
+                                        setIsModalOpen(true);
+                                    }
+                                }}
+                                className="absolute left-[5.5rem] right-0 flex items-stretch text-left"
                                 style={{
                                     top: `${top}%`,
                                     height: `calc(${height}% - 4px)`,
@@ -269,14 +292,17 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
                                         <p className="text-xs text-white/60 drop-shadow-sm mt-1 truncate">{event.description}</p>
                                     )}
                                 </div>
-                            </div>
+                            </button>
                         );
                     })}
                 </div>
             </main>
             
             <button
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => {
+                    setEditingEvent(null);
+                    setIsModalOpen(true);
+                }}
                 className="fixed bottom-24 right-6 w-12 h-12 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-xl transform hover:scale-110 active:scale-100 transition-all duration-200 z-40"
                 aria-label="Add new event"
             >
@@ -285,10 +311,15 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
 
             {isModalOpen && (
                 <AddEventModal 
-                    onClose={() => setIsModalOpen(false)} 
-                    onSave={handleSaveEvent} 
+                    onClose={() => {
+                        setIsModalOpen(false);
+                        setEditingEvent(null);
+                    }} 
+                    onSave={handleSaveFromModal}
+                    onDelete={handleDeleteFromModal}
                     selectedDate={selectedDate}
                     events={events}
+                    eventToEdit={editingEvent}
                 />
             )}
         </div>

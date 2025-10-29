@@ -156,6 +156,19 @@ const App: React.FC = () => {
     setIsAddEventModalOpen(false);
   };
 
+  const handleUpdateEvent = (eventId: string, updatedData: Partial<Omit<TimetableEvent, 'id'>>) => {
+    setTimetableEvents(prevEvents =>
+      prevEvents.map(event =>
+        event.id === eventId ? { ...event, ...updatedData } : event
+      )
+    );
+  };
+
+  const handleDeleteEvent = (eventId: string) => {
+      setTimetableEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
+  };
+
+
   const handleGenerateFlashcards = async (topicId: string, topicName: string, subjectName: string) => {
       const existingSet = flashcardSets[topicId];
       const existingQuestions = existingSet ? existingSet.cards.map(c => c.question) : [];
@@ -241,6 +254,8 @@ const App: React.FC = () => {
                 onBack={() => setCurrentScreen('home')} 
                 events={timetableEvents} 
                 onAddEvent={handleAddEvent}
+                onUpdateEvent={handleUpdateEvent}
+                onDeleteEvent={handleDeleteEvent}
                 isModalOpen={isAddEventModalOpen}
                 setIsModalOpen={setIsAddEventModalOpen}
             />;

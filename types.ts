@@ -61,6 +61,7 @@ export interface TimetableEvent {
   endTime: string;   // ISO string
   color: string;
   repeats?: string;
+  originalId?: string;
 }
 
 // New type for Flashcards
