@@ -123,8 +123,7 @@ const FlashcardsScreen: React.FC<FlashcardsScreenProps> = ({ subjects, flashcard
 
     const renderSelectionView = () => (
         <div className="flex flex-col items-center justify-center text-center h-full max-w-sm mx-auto">
-             <TrophyIcon className="w-12 h-12 text-yellow-400" />
-            <h2 className="text-2xl font-bold mt-2">Flashcard Study</h2>
+            <h2 className="text-2xl font-bold">Flashcard Study</h2>
             <p className="text-gray-400 mt-2">Select a chapter, generate cards with AI, and test your knowledge.</p>
             
             <div className="w-full mt-8 space-y-4">

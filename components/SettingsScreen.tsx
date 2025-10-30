@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Subject } from '../types';
-import { ClockIcon, GraduationCapIcon, TrashIcon, ArrowBackIcon, CheckIcon, CloseIcon, AddIcon, ArrowForwardIcon } from './icons/Icons';
+import { ClockIcon, GraduationCapIcon, TrashIcon, ArrowBackIcon, CheckIcon, CloseIcon, AddIcon, ArrowForwardIcon, ChevronDownIcon, ChevronUpIcon } from './icons/Icons';
+import { EXAM_DATA } from '../data/exams';
 
 const AddItemInput: React.FC<{ onSave: (name: string) => void, onCancel: () => void, placeholder: string }> = ({ onSave, onCancel, placeholder }) => {
     const [name, setName] = useState('');
@@ -37,18 +38,6 @@ const AddItemInput: React.FC<{ onSave: (name: string) => void, onCancel: () => v
     );
 };
 
-// Exam goal options from the personalization quiz
-const mainGoalOptions: Record<string, string[]> = {
-  'School-Level & Foundational Exams': [
-    'Class 10 Board Exams', 'Class 12 Board Exams',
-    'NTSE (National Talent Search Exam)', 'Science/Math Olympiads'
-  ],
-  'Engineering': [
-    'JEE Main', 'JEE Advanced', 'BITSAT', 'VITEEE'
-  ]
-};
-
-
 interface SettingsScreenProps {
     subjects: Subject[];
     dailyGoal: number;
@@ -74,6 +63,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
 }) => {
     const [isAddingSubject, setIsAddingSubject] = useState(false);
     const [isSelectingExamGoal, setIsSelectingExamGoal] = useState(false);
+    const [expandedExam, setExpandedExam] = useState<string | null>(null);
     
     const [initialSettings, setInitialSettings] = useState({ dailyGoal, examGoal, subjects });
     const [hasChanges, setHasChanges] = useState(false);
@@ -99,6 +89,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
     const handleSelectExamGoal = (goal: string) => {
         onExamGoalChange(goal);
         setIsSelectingExamGoal(false);
+        setExpandedExam(null);
     };
 
     const handleSave = () => {
@@ -213,20 +204,50 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                                 <CloseIcon className="w-6 h-6 text-gray-300" />
                             </button>
                         </div>
-                        <div className="space-y-3 overflow-y-auto">
-                            {Object.entries(mainGoalOptions).map(([category, catOptions]) => (
-                                <div key={category}>
-                                    <h3 className="text-sm font-semibold text-slate-400 my-3 px-1 uppercase tracking-wider">{category}</h3>
-                                    <div className="space-y-3">
-                                        {catOptions.map(option => (
-                                            <button 
-                                                key={option} 
-                                                onClick={() => handleSelectExamGoal(option)} 
-                                                className="w-full bg-[#1F2125] p-4 rounded-xl text-left hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transform hover:-translate-y-1"
-                                            >
-                                                <span className="text-slate-200 font-medium">{option}</span>
-                                            </button>
-                                        ))}
+                        <div className="space-y-3 overflow-y-auto no-scrollbar">
+                            {EXAM_DATA.map(({ categoryName, exams }) => (
+                                <div key={categoryName}>
+                                    <h3 className="text-sm font-semibold text-slate-400 my-3 px-1 uppercase tracking-wider">{categoryName}</h3>
+                                    <div className="space-y-2">
+                                        {exams.map(exam => {
+                                            const isExpanded = expandedExam === exam.name;
+                                            return (
+                                                <div key={exam.name} className="bg-[#1F2125] rounded-xl transition-all duration-300">
+                                                    <button
+                                                        onClick={() => setExpandedExam(isExpanded ? null : exam.name)}
+                                                        className="w-full p-4 text-left flex justify-between items-center"
+                                                        aria-expanded={isExpanded}
+                                                    >
+                                                        <span className="text-slate-200 font-medium">{exam.name}</span>
+                                                        {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                                                    </button>
+                                                    {isExpanded && (
+                                                        <div className="px-4 pb-4 pt-0">
+                                                            <div className="border-t border-slate-700 pt-3 space-y-3 text-sm">
+                                                                <div>
+                                                                    <p className="font-semibold text-slate-400">Conducting Body:</p>
+                                                                    <p className="text-slate-300">{exam.conductingBody}</p>
+                                                                </div>
+                                                                <div>
+                                                                    <p className="font-semibold text-slate-400">Purpose:</p>
+                                                                    <p className="text-slate-300">{exam.purpose}</p>
+                                                                </div>
+                                                                <div>
+                                                                    <p className="font-semibold text-slate-400">Subjects / Sections:</p>
+                                                                    <p className="text-slate-300">{exam.subjects}</p>
+                                                                </div>
+                                                                <button
+                                                                    onClick={() => handleSelectExamGoal(exam.name)}
+                                                                    className="w-full mt-2 bg-[#A89AFF] text-black font-bold py-2 px-4 rounded-lg transition-all transform hover:scale-105 active:scale-100"
+                                                                >
+                                                                    Select this Goal
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             ))}

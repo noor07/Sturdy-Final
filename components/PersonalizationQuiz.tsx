@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Avatars } from './icons/Avatars';
+import { EXAM_DATA } from '../data/exams';
 
 interface PersonalizationQuizProps {
   onComplete: (data: { name: string; avatar: number }) => void;
@@ -9,16 +10,6 @@ const currentStatusOptions = [
   '10th', '11th', '12th', 'Pursuing Undergraduate',
   'Pursuing Postgraduate', 'Pursuing Doctoral programs', 'Preparing for exams'
 ];
-
-const mainGoalOptions: Record<string, string[]> = {
-  'School-Level & Foundational Exams': [
-    'Class 10 Board Exams', 'Class 12 Board Exams',
-    'NTSE (National Talent Search Exam)', 'Science/Math Olympiads'
-  ],
-  'Engineering': [
-    'JEE Main', 'JEE Advanced', 'BITSAT', 'VITEEE'
-  ]
-};
 
 const lessonTimeOptions = [
   '4 hours/day', '6 hours/day', '8 hours/day', '10 hours/day'
@@ -129,7 +120,7 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
         return (
           <div className="flex flex-col h-full justify-center glass-card p-6 rounded-2xl">
             <h1 className="text-2xl font-bold text-center mb-8">{title}</h1>
-            <div className="space-y-3 overflow-y-auto">
+            <div className="space-y-3 overflow-y-auto no-scrollbar">
               {isStep2 ? (
                 currentStatusOptions.map(option => (
                   <button key={option} onClick={() => handleSelectOptionAndNext(field, option)} className="w-full glass-input p-4 rounded-xl text-left hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transform hover:-translate-y-1">
@@ -137,13 +128,13 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
                   </button>
                 ))
               ) : (
-                Object.entries(mainGoalOptions).map(([category, catOptions]) => (
-                  <div key={category}>
-                    <h2 className="text-sm font-semibold text-slate-400 my-3 px-1 uppercase tracking-wider">{category}</h2>
+                EXAM_DATA.map(({ categoryName, exams }) => (
+                  <div key={categoryName}>
+                    <h2 className="text-sm font-semibold text-slate-400 my-3 px-1 uppercase tracking-wider">{categoryName}</h2>
                     <div className="space-y-3">
-                    {catOptions.map(option => (
-                      <button key={option} onClick={() => handleSelectOptionAndNext(field, option)} className="w-full glass-input p-4 rounded-xl text-left hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transform hover:-translate-y-1">
-                        <span className="text-slate-200 font-medium">{option}</span>
+                    {exams.map(exam => (
+                      <button key={exam.name} onClick={() => handleSelectOptionAndNext(field, exam.name)} className="w-full glass-input p-4 rounded-xl text-left hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transform hover:-translate-y-1">
+                        <span className="text-slate-200 font-medium">{exam.name}</span>
                       </button>
                     ))}
                     </div>
@@ -195,7 +186,7 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
           style={{ width: `${progressPercentage}%` }}
         ></div>
       </div>
-      <div className="flex-grow flex flex-col">
+      <div className="flex-grow flex flex-col min-h-0">
         {renderStep()}
       </div>
     </div>
