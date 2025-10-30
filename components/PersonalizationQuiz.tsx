@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import { Avatars } from './icons/Avatars';
 import { EXAM_DATA } from '../data/exams';
+import { ChevronUpIcon, ChevronDownIcon } from './icons/Icons';
 
 interface PersonalizationQuizProps {
   onComplete: (data: { name: string; avatar: number }) => void;
@@ -15,15 +17,9 @@ const lessonTimeOptions = [
   '4 hours/day', '6 hours/day', '8 hours/day', '10 hours/day'
 ];
 
-const ChevronDownIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-    </svg>
-);
-
-
 const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete }) => {
   const [step, setStep] = useState(1);
+  const [expandedExam, setExpandedExam] = useState<string | null>(null);
   const [userData, setUserData] = useState({
     avatar: 8,
     name: '',
@@ -118,29 +114,65 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
         const field: keyof typeof userData = isStep2 ? 'currentStatus' : 'mainGoal';
 
         return (
-          <div className="flex flex-col h-full justify-center glass-card p-6 rounded-2xl">
+          <div className="flex flex-col h-full glass-card p-6 rounded-2xl">
             <h1 className="text-2xl font-bold text-center mb-8">{title}</h1>
-            <div className="space-y-3 overflow-y-auto no-scrollbar">
-              {isStep2 ? (
-                currentStatusOptions.map(option => (
-                  <button key={option} onClick={() => handleSelectOptionAndNext(field, option)} className="w-full glass-input p-4 rounded-xl text-left hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transform hover:-translate-y-1">
-                    <span className="text-slate-200 font-medium">{option}</span>
-                  </button>
-                ))
-              ) : (
-                EXAM_DATA.map(({ categoryName, exams }) => (
-                  <div key={categoryName}>
-                    <h2 className="text-sm font-semibold text-slate-400 my-3 px-1 uppercase tracking-wider">{categoryName}</h2>
-                    <div className="space-y-3">
-                    {exams.map(exam => (
-                      <button key={exam.name} onClick={() => handleSelectOptionAndNext(field, exam.name)} className="w-full glass-input p-4 rounded-xl text-left hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transform hover:-translate-y-1">
-                        <span className="text-slate-200 font-medium">{exam.name}</span>
-                      </button>
-                    ))}
+            <div className="overflow-y-auto no-scrollbar flex-grow">
+              <div className="space-y-3">
+                {isStep2 ? (
+                  currentStatusOptions.map(option => (
+                    <button key={option} onClick={() => handleSelectOptionAndNext(field, option)} className="w-full glass-input p-4 rounded-xl text-left hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transform hover:-translate-y-1">
+                      <span className="text-slate-200 font-medium">{option}</span>
+                    </button>
+                  ))
+                ) : (
+                  EXAM_DATA.map(({ categoryName, exams }) => (
+                    <div key={categoryName}>
+                      <h2 className="text-sm font-semibold text-slate-400 my-3 px-1 uppercase tracking-wider">{categoryName}</h2>
+                      <div className="space-y-2">
+                        {exams.map(exam => {
+                          const isExpanded = expandedExam === exam.name;
+                          return (
+                            <div key={exam.name} className="glass-input rounded-xl transition-all duration-300">
+                              <button
+                                onClick={() => setExpandedExam(isExpanded ? null : exam.name)}
+                                className="w-full p-4 text-left flex justify-between items-center"
+                                aria-expanded={isExpanded}
+                              >
+                                <span className="text-slate-200 font-medium">{exam.name}</span>
+                                {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                              </button>
+                              {isExpanded && (
+                                <div className="px-4 pb-4 pt-0">
+                                  <div className="border-t border-slate-700 pt-3 space-y-3 text-sm">
+                                    <div>
+                                      <p className="font-semibold text-slate-400">Conducting Body:</p>
+                                      <p className="text-slate-300">{exam.conductingBody}</p>
+                                    </div>
+                                    <div>
+                                      <p className="font-semibold text-slate-400">Purpose:</p>
+                                      <p className="text-slate-300">{exam.purpose}</p>
+                                    </div>
+                                    <div>
+                                      <p className="font-semibold text-slate-400">Subjects / Sections:</p>
+                                      <p className="text-slate-300">{exam.subjects}</p>
+                                    </div>
+                                    <button
+                                      onClick={() => handleSelectOptionAndNext(field, exam.name)}
+                                      className="w-full mt-2 bg-[#A89AFF] text-black font-bold py-2 px-4 rounded-lg transition-all transform hover:scale-105 active:scale-100"
+                                    >
+                                      Select this Goal
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
           </div>
         );
