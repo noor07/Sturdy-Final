@@ -246,11 +246,11 @@ const FlashcardsScreen: React.FC<FlashcardsScreenProps> = ({ subjects, flashcard
 
                 {/* Controls */}
                 <div className="mt-6 flex justify-center items-center gap-6">
-                    <button onClick={() => handleAnswer(false)} className="p-4 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-all transform active:scale-90 ring-2 ring-red-500/30">
-                        <FlashcardXIcon />
+                    <button onClick={() => handleAnswer(false)} className="p-5 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-all transform active:scale-90 ring-2 ring-red-500/30">
+                        <FlashcardXIcon className="h-10 w-10" />
                     </button>
-                    <button onClick={() => handleAnswer(true)} className="p-4 rounded-full bg-green-500/20 text-green-400 hover:bg-green-500/40 transition-all transform active:scale-90 ring-2 ring-green-500/30">
-                        <FlashcardCheckIcon />
+                    <button onClick={() => handleAnswer(true)} className="p-5 rounded-full bg-green-500/20 text-green-400 hover:bg-green-500/40 transition-all transform active:scale-90 ring-2 ring-green-500/30">
+                        <FlashcardCheckIcon className="h-10 w-10" />
                     </button>
                 </div>
             </div>
