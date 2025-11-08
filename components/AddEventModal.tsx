@@ -43,8 +43,8 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, onDelete, sele
             setTitle(eventToEdit.title);
             setDescription(eventToEdit.description || '');
             setSelectedColor(eventToEdit.color);
-            setStartTime(new Date(eventToEdit.startTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }));
-            setEndTime(new Date(eventToEdit.endTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }));
+            setStartTime(new Date(eventToEdit.start_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }));
+            setEndTime(new Date(eventToEdit.end_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }));
             
             const repeats = eventToEdit.repeats || 'Does not repeat';
             if (repeats === 'Daily') {
@@ -194,7 +194,7 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, onDelete, sele
         const newEventEndTime = combineDateAndTime(selectedDate, endTime);
 
         const eventsOnSelectedDay = events.filter(event => {
-            const isSame = isSameDay(new Date(event.startTime), selectedDate);
+            const isSame = isSameDay(new Date(event.start_time), selectedDate);
             if (isEditMode && event.id === eventToEdit.id) {
                 return false; // Exclude the event being edited from the check
             }
@@ -202,8 +202,8 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, onDelete, sele
         });
 
         const isOverlapping = eventsOnSelectedDay.some(existingEvent => {
-            const existingStart = new Date(existingEvent.startTime).getTime();
-            const existingEnd = new Date(existingEvent.endTime).getTime();
+            const existingStart = new Date(existingEvent.start_time).getTime();
+            const existingEnd = new Date(existingEvent.end_time).getTime();
             const newStart = new Date(newEventStartTime).getTime();
             const newEnd = new Date(newEventEndTime).getTime();
     
@@ -226,8 +226,8 @@ const AddEventModal: FC<AddEventModalProps> = ({ onClose, onSave, onDelete, sele
             description,
             color: selectedColor,
             repeats: getRepeatsString(),
-            startTime: newEventStartTime,
-            endTime: newEventEndTime,
+            start_time: newEventStartTime,
+            end_time: newEventEndTime,
         });
     };
     

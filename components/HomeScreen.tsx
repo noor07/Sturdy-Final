@@ -79,12 +79,12 @@ interface HomeScreenProps {
     userName: string;
     userAvatar: number;
     subjects: Subject[];
-    setSubjects: React.Dispatch<React.SetStateAction<Subject[]>>;
+    onUpdateSubject: (subject: Subject) => void;
     onNavigateToSettings: () => void;
     events: TimetableEvent[];
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects, setSubjects, onNavigateToSettings, events }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects, onUpdateSubject, onNavigateToSettings, events }) => {
     const [activeDate, setActiveDate] = useState<number>(18);
     const [addingState, setAddingState] = useState<{ type: 'topic' | 'subtopic'; parentId: string } | null>(null);
     
@@ -92,16 +92,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
         const now = new Date();
         const todayEvents = events
             .filter(event => {
-                const eventDate = new Date(event.startTime);
+                const eventDate = new Date(event.start_time);
                 return eventDate.getFullYear() === now.getFullYear() &&
                        eventDate.getMonth() === now.getMonth() &&
                        eventDate.getDate() === now.getDate();
             })
-            .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+            .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
         const currentEvent = todayEvents.find(event => {
-            const startTime = new Date(event.startTime);
-            const endTime = new Date(event.endTime);
+            const startTime = new Date(event.start_time);
+            const endTime = new Date(event.end_time);
             return now >= startTime && now <= endTime;
         });
 
@@ -109,7 +109,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
             return { eventToShow: currentEvent, eventStatus: 'Happening Now' };
         }
 
-        const nextEvent = todayEvents.find(event => new Date(event.startTime) > now);
+        const nextEvent = todayEvents.find(event => new Date(event.start_time) > now);
         if (nextEvent) {
             return { eventToShow: nextEvent, eventStatus: 'Up Next' };
         }
@@ -118,58 +118,52 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
     }, [events]);
     
     const toggleSubject = (id: string) => {
-        setSubjects(prevSubjects => prevSubjects.map(s => s.id === id ? { ...s, isExpanded: !s.isExpanded } : s));
+        const subject = subjects.find(s => s.id === id);
+        if (subject) {
+            onUpdateSubject({ ...subject, is_expanded: !subject.is_expanded });
+        }
     };
 
     const toggleTopic = (subjectId: string, topicId: string) => {
-        setSubjects(prevSubjects => prevSubjects.map(s => {
-            if (s.id === subjectId) {
-                return {
-                    ...s,
-                    topics: s.topics.map(t => t.id === topicId ? { ...t, isExpanded: !t.isExpanded } : t)
-                }
-            }
-            return s;
-        }));
+        const subject = subjects.find(s => s.id === subjectId);
+        if (subject) {
+            const updatedTopics = subject.topics.map(t => t.id === topicId ? { ...t, isExpanded: !t.isExpanded } : t);
+            onUpdateSubject({ ...subject, topics: updatedTopics });
+        }
     };
     
     const handleAddTopic = (subjectId: string, name: string) => {
-        setSubjects(prevSubjects => prevSubjects.map(s => {
-            if (s.id === subjectId) {
-                const newTopic = {
-                    id: `topic-${Date.now()}`,
-                    name,
-                    progress: 0,
-                    isExpanded: true,
-                    subTopics: []
-                };
-                return { ...s, topics: [...s.topics, newTopic] };
-            }
-            return s;
-        }));
+        const subject = subjects.find(s => s.id === subjectId);
+        if (subject) {
+            const newTopic = {
+                id: `topic-${Date.now()}`,
+                name,
+                progress: 0,
+                isExpanded: true,
+                subTopics: []
+            };
+            const updatedTopics = [...subject.topics, newTopic];
+            onUpdateSubject({ ...subject, topics: updatedTopics });
+        }
         setAddingState(null);
     };
 
     const handleAddSubTopic = (subjectId: string, topicId: string, name: string) => {
-        setSubjects(prevSubjects => prevSubjects.map(s => {
-            if (s.id === subjectId) {
-                return {
-                    ...s,
-                    topics: s.topics.map(t => {
-                        if (t.id === topicId) {
-                            const newSubTopic = {
-                                id: `subtopic-${Date.now()}`,
-                                name,
-                                completed: false
-                            };
-                            return { ...t, subTopics: [...t.subTopics, newSubTopic] };
-                        }
-                        return t;
-                    })
+        const subject = subjects.find(s => s.id === subjectId);
+        if (subject) {
+            const updatedTopics = subject.topics.map(t => {
+                if (t.id === topicId) {
+                    const newSubTopic = {
+                        id: `subtopic-${Date.now()}`,
+                        name,
+                        completed: false
+                    };
+                    return { ...t, subTopics: [...t.subTopics, newSubTopic] };
                 }
-            }
-            return s;
-        }));
+                return t;
+            });
+            onUpdateSubject({ ...subject, topics: updatedTopics });
+        }
         setAddingState(null);
     };
 
@@ -210,9 +204,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
                     </p>
                     <h3 className="font-bold text-lg text-white mt-1 truncate">{eventToShow.title}</h3>
                     <p className="text-sm text-gray-300 mt-1">
-                        {new Date(eventToShow.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                        {new Date(eventToShow.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                         {' - '}
-                        {new Date(eventToShow.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                        {new Date(eventToShow.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                     </p>
                 </div>
             </div>
@@ -251,12 +245,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
                         <CircularProgress progress={subject.progress} />
                         <div className="flex-1 mt-1">
                             <h2 className="font-bold text-lg">{subject.name}</h2>
-                            <p className="text-sm text-gray-400">{subject.timeSpent}</p>
+                            <p className="text-sm text-gray-400">{subject.time_spent}</p>
                         </div>
                         <div className="flex items-center gap-1">
                              <button className="p-1 rounded-full hover:bg-white/10 transition-colors"><EditIcon className="w-4 h-4 text-gray-400" /></button>
                             <button onClick={() => toggleSubject(subject.id)} className="flex items-center text-gray-400 text-xs gap-1 hover:text-white transition-colors">
-                                Hide Details {subject.isExpanded ? <ChevronUpIcon className="w-5 h-5"/> : <ChevronDownIcon className="w-5 h-5"/>}
+                                Hide Details {subject.is_expanded ? <ChevronUpIcon className="w-5 h-5"/> : <ChevronDownIcon className="w-5 h-5"/>}
                             </button>
                         </div>
                     </div>
@@ -264,7 +258,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
                         <div className="bg-[#34D399] h-1 rounded-full" style={{ width: `${subject.progress}%` }}></div>
                     </div>
 
-                    {subject.isExpanded && (
+                    {subject.is_expanded && (
                        <div className="mt-4 space-y-3">
                            {subject.topics.map(topic => (
                                // Chapter Card (e.g., "Chemical Reactions and Equations"). This is a "Topic" in the code.

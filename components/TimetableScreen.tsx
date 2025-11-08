@@ -78,7 +78,7 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
         const startOfGivenDay = startOfDay(day);
 
         return events.some(event => {
-            const originalStartDate = new Date(event.startTime);
+            const originalStartDate = new Date(event.start_time);
             const startOfOriginalDate = startOfDay(originalStartDate);
 
             // Check if it's the original day of the event
@@ -121,7 +121,7 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
         const selectedDateStart = startOfDay(selectedDate);
 
         for (const event of events) {
-            const originalStartDate = new Date(event.startTime);
+            const originalStartDate = new Date(event.start_time);
             const originalStartDateStart = startOfDay(originalStartDate);
             
             // Handle non-repeating events
@@ -149,16 +149,16 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
                 const newStartTime = new Date(selectedDate);
                 newStartTime.setHours(originalStartDate.getHours(), originalStartDate.getMinutes(), originalStartDate.getSeconds(), originalStartDate.getMilliseconds());
 
-                const originalEndTime = new Date(event.endTime);
+                const originalEndTime = new Date(event.end_time);
                 const newEndTime = new Date(selectedDate);
                 newEndTime.setHours(originalEndTime.getHours(), originalEndTime.getMinutes(), originalEndTime.getSeconds(), originalEndTime.getMilliseconds());
 
                 resultingEvents.push({
                     ...event,
-                    originalId: event.id, // Keep track of the original event ID
+                    original_id: event.id, // Keep track of the original event ID
                     id: `${event.id}-${selectedDate.toISOString().split('T')[0]}`, // Create a unique key for this instance
-                    startTime: newStartTime.toISOString(),
-                    endTime: newEndTime.toISOString(),
+                    start_time: newStartTime.toISOString(),
+                    end_time: newEndTime.toISOString(),
                 });
             }
         }
@@ -257,8 +257,8 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
 
                     {/* Event Blocks */}
                     {eventsForSelectedDay.map(event => {
-                        const start = new Date(event.startTime);
-                        const end = new Date(event.endTime);
+                        const start = new Date(event.start_time);
+                        const end = new Date(event.end_time);
                         const top = (dateToMinutes(start) / (24 * 60)) * 100;
                         const height = ((dateToMinutes(end) - dateToMinutes(start)) / (24 * 60)) * 100;
 
@@ -266,7 +266,7 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAdd
                             <button
                                 key={event.id}
                                 onClick={() => {
-                                    const originalEvent = events.find(e => e.id === (event.originalId || event.id));
+                                    const originalEvent = events.find(e => e.id === (event.original_id || event.id));
                                     if (originalEvent) {
                                         setEditingEvent(originalEvent);
                                         setIsModalOpen(true);

@@ -7,7 +7,7 @@ interface NotesScreenProps {
     onBack: () => void;
     subjects: Subject[];
     notes: Note[];
-    onAddNote: (note: Omit<Note, 'id' | 'createdAt'>) => void;
+    onAddNote: (note: Omit<Note, 'id' | 'created_at'>) => void;
     onSelectNote: (note: Note) => void;
     onDeleteNote: (noteId: string) => void;
 }
@@ -64,7 +64,7 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
             alert('Please fill out all fields.');
             return;
         }
-        onAddNote({ title, subjectName, content });
+        onAddNote({ title, subject_name: subjectName, content });
         setIsCreateTextNoteModalOpen(false);
         setIsCreateSimpleNoteModalOpen(false);
     };
@@ -74,7 +74,7 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
             alert('Please provide a title, subject, and at least one image.');
             return;
         }
-        onAddNote({ title, subjectName, images: selectedImages });
+        onAddNote({ title, subject_name: subjectName, images: selectedImages });
         setIsCreateImageNoteModalOpen(false);
     };
 
@@ -111,7 +111,7 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
     const filteredNotes = notes.filter(note => 
         note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (note.content && note.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        note.subjectName.toLowerCase().includes(searchTerm.toLowerCase())
+        note.subject_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const getPreviewText = (htmlContent?: string) => {
@@ -154,7 +154,7 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                         {filteredNotes.map(note => (
                             <div key={note.id} className="bg-[#1F2125] p-4 rounded-xl border border-gray-800/50 shadow-sm transition-all duration-200 hover:border-gray-700 transform hover:-translate-y-1">
                                 <button onClick={() => onSelectNote(note)} className="w-full text-left">
-                                    <p className="text-sm text-green-400 font-semibold uppercase tracking-wider">{note.subjectName}</p>
+                                    <p className="text-sm text-green-400 font-semibold uppercase tracking-wider">{note.subject_name}</p>
                                     <h3 className="font-bold text-xl text-white mt-1 truncate">{note.title}</h3>
                                     {note.images && note.images.length > 0 ? (
                                         <img src={note.images[0]} alt="Note preview" className="mt-2 rounded-lg h-32 w-full object-cover" />
@@ -164,7 +164,7 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                                 </button>
                                 <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-800">
                                     <p className="text-xs text-gray-500">
-                                        {new Date(note.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                        {new Date(note.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                     </p>
                                     <button 
                                         onClick={(e) => {
@@ -190,6 +190,14 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                 <div 
                     className={`transition-all duration-300 ease-in-out flex flex-col items-end gap-3 ${isFabMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6 pointer-events-none'}`}
                 >
+                     <button
+                        onClick={handleOpenCreateTextNoteModal}
+                        className="flex items-center gap-3 bg-[#2D2F34] text-white pl-4 pr-5 py-2 rounded-full shadow-lg transform hover:scale-105 active:scale-100 transition-transform duration-200"
+                        aria-label="Create rich text note"
+                    >
+                        <ChecklistIcon className="w-5 h-5" />
+                        <span className="font-semibold text-sm">List</span>
+                    </button>
                     <button
                         onClick={handleOpenCreateSimpleNoteModal}
                         className="flex items-center gap-3 bg-[#2D2F34] text-white pl-4 pr-5 py-2 rounded-full shadow-lg transform hover:scale-105 active:scale-100 transition-transform duration-200"

@@ -1,16 +1,38 @@
 import React, { useState } from 'react';
+import { supabase } from '../services/supabase';
 
-interface AuthProps {
-    onLogin: () => void;
-}
-
-const Auth: React.FC<AuthProps> = ({ onLogin }) => {
+const Auth: React.FC = () => {
     const [isSignUp, setIsSignUp] = useState(true);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleAuthAction = (e: React.FormEvent) => {
+    const handleAuthAction = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Simulate a successful login/signup
-        onLogin();
+        setLoading(true);
+        setError(null);
+
+        try {
+            if (isSignUp) {
+                const { data, error } = await supabase.auth.signUp({ email, password });
+                if (error) throw error;
+                if (data.user) {
+                    // Create a corresponding profile for the new user
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .insert({ id: data.user.id, email: data.user.email });
+                    if (profileError) throw profileError;
+                }
+            } else {
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+            }
+        } catch (err: any) {
+            setError(err.error_description || err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -33,30 +55,34 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                             <input
                                 type="email"
                                 placeholder="Email"
-                                defaultValue="fdsfsd@gmail.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 required
                                 className="w-full glass-input text-white placeholder-slate-400 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all"
                             />
                             <input
                                 type="password"
                                 placeholder="Password"
-                                defaultValue="fdfsf"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 required
                                 className="w-full glass-input text-white placeholder-slate-400 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all"
                             />
                         </div>
                          <button
                             type="submit"
-                            className="w-full mt-6 bg-white text-black font-bold py-3 px-4 rounded-full transition-transform transform hover:scale-105 active:scale-100 shadow-lg shadow-purple-500/20"
+                            disabled={loading}
+                            className="w-full mt-6 bg-white text-black font-bold py-3 px-4 rounded-full transition-transform transform hover:scale-105 active:scale-100 shadow-lg shadow-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isSignUp ? 'Sign Up' : 'Sign In'}
+                            {loading ? 'Processing...' : (isSignUp ? 'Sign Up' : 'Sign In')}
                         </button>
                     </form>
+                    {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
                 </main>
 
                  <button
                     type="button"
-                    onClick={() => setIsSignUp(!isSignUp)}
+                    onClick={() => { setIsSignUp(!isSignUp); setError(null); }}
                     className="w-full mt-6 text-sm text-slate-400 hover:text-white transition-colors"
                 >
                     {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}

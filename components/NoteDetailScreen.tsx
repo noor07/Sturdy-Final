@@ -7,7 +7,7 @@ interface NoteDetailScreenProps {
     note: Note;
     subjects: Subject[];
     onBack: () => void;
-    onUpdateNote: (noteId: string, updatedData: Partial<Omit<Note, 'id' | 'createdAt'>>) => void;
+    onUpdateNote: (noteId: string, updatedData: Partial<Omit<Note, 'id' | 'created_at'>>) => void;
 }
 
 const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, subjects, onBack, onUpdateNote }) => {
@@ -15,7 +15,7 @@ const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, subjects, onB
     
     // State for the edit form
     const [title, setTitle] = useState(note.title);
-    const [subjectName, setSubjectName] = useState(note.subjectName);
+    const [subjectName, setSubjectName] = useState(note.subject_name);
     const [content, setContent] = useState(note.content || '');
     const [images, setImages] = useState<string[]>(note.images || []);
     
@@ -23,7 +23,7 @@ const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, subjects, onB
 
     useEffect(() => {
         setTitle(note.title);
-        setSubjectName(note.subjectName);
+        setSubjectName(note.subject_name);
         setContent(note.content || '');
         setImages(note.images || []);
     }, [note]);
@@ -45,8 +45,8 @@ const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, subjects, onB
         }
 
         const updatedData = isImageNote
-            ? { title, subjectName, images, content: undefined }
-            : { title, subjectName, content, images: undefined };
+            ? { title, subject_name: subjectName, images, content: undefined }
+            : { title, subject_name: subjectName, content, images: undefined };
         
         onUpdateNote(note.id, updatedData);
         setIsEditing(false);
@@ -102,10 +102,10 @@ const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, subjects, onB
                 </header>
 
                 <main className="mt-4 bg-[#2D2F34] rounded-xl p-5">
-                    <p className="text-sm text-green-400 font-semibold uppercase tracking-wider">{note.subjectName}</p>
+                    <p className="text-sm text-green-400 font-semibold uppercase tracking-wider">{note.subject_name}</p>
                     <h2 className="text-2xl font-bold text-white mt-1 mb-3">{note.title}</h2>
                     <p className="text-xs text-gray-400 mb-4">
-                        Created on {new Date(note.createdAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                        Created on {new Date(note.created_at).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
                     <hr className="border-gray-700 my-4" />
                     {note.content && (

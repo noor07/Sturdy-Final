@@ -47,6 +47,7 @@ interface SettingsScreenProps {
     onBack: () => void;
     onDailyGoalChange: (goal: number) => void;
     onExamGoalChange: (goal: string) => void;
+    onUpdateProfile: (data: { daily_goal?: number; exam_goal?: string }) => Promise<void>;
     setSubjects: (subjects: Subject[]) => void;
 }
 
@@ -59,6 +60,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
     onBack,
     onDailyGoalChange,
     onExamGoalChange,
+    onUpdateProfile,
     setSubjects,
 }) => {
     const [isAddingSubject, setIsAddingSubject] = useState(false);
@@ -92,7 +94,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
         setExpandedExam(null);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        await onUpdateProfile({ daily_goal: dailyGoal, exam_goal: examGoal });
         setInitialSettings({ dailyGoal, examGoal, subjects });
         setShowSavedMessage(true);
         setTimeout(() => setShowSavedMessage(false), 2000);

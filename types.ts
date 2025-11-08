@@ -36,32 +36,36 @@ export interface Subject {
   id:string;
   name: string;
   progress: number;
-  timeSpent: string;
+  time_spent: string;
   topics: Topic[];
-  isExpanded: boolean;
+  is_expanded: boolean;
+  user_id?: string;
+  created_at?: string;
 }
 
 // New type for Notes
 export interface Note {
   id: string;
   title: string;
-  subjectName: string;
+  subject_name: string;
   content?: string;
   images?: string[];
-  createdAt: string;
+  created_at: string;
+  user_id?: string;
 }
 
 // New type for Timetable
 export interface TimetableEvent {
   id: string;
   title: string;
-  subjectName?: string;
+  subject_name?: string;
   description?: string;
-  startTime: string; // ISO string
-  endTime: string;   // ISO string
+  start_time: string; // ISO string
+  end_time: string;   // ISO string
   color: string;
   repeats?: string;
-  originalId?: string;
+  original_id?: string;
+  user_id?: string;
 }
 
 // New type for Flashcards
@@ -71,9 +75,10 @@ export interface Flashcard {
 }
 
 export interface FlashcardSet {
-  topicId: string;
-  topicName: string;
-  subjectName: string;
+  topic_id: string;
+  topic_name: string;
+  subject_name: string;
   cards: Flashcard[];
   score: number;
+  user_id?: string;
 }
