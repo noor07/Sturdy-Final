@@ -80,6 +80,11 @@ const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, subjects, onB
             }
         }
     };
+    
+    const isHtmlContent = note.content && /<[a-z][\s\S]*>/i.test(note.content);
+    const displayContent = isHtmlContent 
+        ? note.content 
+        : `<p>${note.content?.replace(/\n/g, '<br />')}</p>`;
 
 
     return (
@@ -104,7 +109,7 @@ const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, subjects, onB
                     </p>
                     <hr className="border-gray-700 my-4" />
                     {note.content && (
-                        <div className="note-content text-gray-300 leading-relaxed" dangerouslySetInnerHTML={{ __html: note.content }} />
+                        <div className="note-content text-gray-300 leading-relaxed" dangerouslySetInnerHTML={{ __html: displayContent }} />
                     )}
                     {note.images && note.images.length > 0 && (
                         <div className="grid grid-cols-2 gap-3 mt-4">

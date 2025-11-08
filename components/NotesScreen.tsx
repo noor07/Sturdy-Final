@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { Subject, Note } from '../types';
-import { SearchIcon, BookIcon, CameraIcon, AddIcon, CloseIcon, TrashIcon, NotesIcon, ChevronDownIcon } from './icons/Icons';
+import { SearchIcon, BookIcon, CameraIcon, AddIcon, CloseIcon, TrashIcon, ChevronDownIcon, ChecklistIcon, TextIcon } from './icons/Icons';
 import RichTextEditor from './RichTextEditor';
 
 interface NotesScreenProps {
@@ -16,6 +16,7 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
     const [isFabMenuOpen, setIsFabMenuOpen] = useState(false);
     const [isCreateTextNoteModalOpen, setIsCreateTextNoteModalOpen] = useState(false);
     const [isCreateImageNoteModalOpen, setIsCreateImageNoteModalOpen] = useState(false);
+    const [isCreateSimpleNoteModalOpen, setIsCreateSimpleNoteModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     
     const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -51,14 +52,21 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
         setIsCreateImageNoteModalOpen(true);
         setIsFabMenuOpen(false);
     };
+    
+    const handleOpenCreateSimpleNoteModal = () => {
+        resetModalForm();
+        setIsCreateSimpleNoteModalOpen(true);
+        setIsFabMenuOpen(false);
+    };
 
-    const handleSaveTextNote = () => {
+    const handleSaveNote = () => {
         if (!title.trim() || !subjectName.trim() || !content.trim()) {
             alert('Please fill out all fields.');
             return;
         }
         onAddNote({ title, subjectName, content });
         setIsCreateTextNoteModalOpen(false);
+        setIsCreateSimpleNoteModalOpen(false);
     };
     
     const handleSaveImageNote = () => {
@@ -108,6 +116,9 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
 
     const getPreviewText = (htmlContent?: string) => {
         if (!htmlContent) return '';
+        const isHtml = /<[a-z][\s\S]*>/i.test(htmlContent);
+        if (!isHtml) return htmlContent;
+        
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = htmlContent;
         return tempDiv.textContent || tempDiv.innerText || '';
@@ -175,40 +186,42 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
             <input type="file" ref={cameraInputRef} onChange={onFileSelected} accept="image/*" multiple style={{ display: 'none' }} />
             
             {/* FAB Menu */}
-            <div className="fixed bottom-24 right-6 flex flex-col items-center gap-4 z-40">
+            <div className="fixed bottom-24 right-6 flex flex-col items-end gap-3 z-40">
                 <div 
-                    className={`transition-all duration-300 ease-in-out flex flex-col items-center gap-4 ${isFabMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6 pointer-events-none'}`}
+                    className={`transition-all duration-300 ease-in-out flex flex-col items-end gap-3 ${isFabMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6 pointer-events-none'}`}
                 >
-                     <button
+                    <button
+                        onClick={handleOpenCreateSimpleNoteModal}
+                        className="flex items-center gap-3 bg-[#2D2F34] text-white pl-4 pr-5 py-2 rounded-full shadow-lg transform hover:scale-105 active:scale-100 transition-transform duration-200"
+                        aria-label="Create simple text note"
+                    >
+                        <TextIcon className="w-5 h-5" />
+                        <span className="font-semibold text-sm">Text</span>
+                    </button>
+                    <button
                         onClick={handleOpenCreateImageNoteModal}
-                        className="w-10 h-10 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-lg transform hover:scale-110 active:scale-95 transition-transform"
+                        className="flex items-center gap-3 bg-[#2D2F34] text-white pl-4 pr-5 py-2 rounded-full shadow-lg transform hover:scale-105 active:scale-100 transition-transform duration-200"
                         aria-label="Capture note with camera"
                     >
                         <CameraIcon className="w-5 h-5" />
-                    </button>
-                    <button
-                        onClick={handleOpenCreateTextNoteModal}
-                        className="w-10 h-10 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-lg transform hover:scale-110 active:scale-95 transition-transform"
-                        aria-label="Create text note"
-                    >
-                        <NotesIcon isActive className="!text-black w-5 h-5" />
+                        <span className="font-semibold text-sm">Image</span>
                     </button>
                 </div>
 
                 <button
                     onClick={() => setIsFabMenuOpen(!isFabMenuOpen)}
-                    className="w-12 h-12 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-xl transform hover:scale-110 transition-all duration-200"
+                    className="w-14 h-14 rounded-full bg-[#A89AFF] text-black flex items-center justify-center shadow-xl transform hover:scale-105 transition-all duration-200"
                     aria-expanded={isFabMenuOpen}
                     aria-label={isFabMenuOpen ? 'Close note options' : 'Open note options'}
                 >
                     <div className={`transform transition-transform duration-300 ${isFabMenuOpen ? 'rotate-45' : 'rotate-0'}`}>
-                       <AddIcon className="w-6 h-6" />
+                       <AddIcon className="w-7 h-7" />
                     </div>
                 </button>
             </div>
         </div>
 
-        {/* Create Text Note Modal */}
+        {/* Create Rich Text Note Modal */}
         {isCreateTextNoteModalOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
                 <div className="bg-[#2D2F34] rounded-2xl p-6 w-full max-w-sm m-4 flex flex-col text-white shadow-2xl">
@@ -249,7 +262,58 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                         />
                     </div>
                     <button
-                        onClick={handleSaveTextNote}
+                        onClick={handleSaveNote}
+                        className="w-full mt-6 bg-[#A89AFF] text-black font-bold py-3 px-4 rounded-xl text-lg transition-all transform hover:scale-105 active:scale-100 shadow-lg shadow-[#A89AFF]/30"
+                    >
+                        Save Note
+                    </button>
+                </div>
+            </div>
+        )}
+        
+        {/* Create Simple Note Modal */}
+        {isCreateSimpleNoteModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+                <div className="bg-[#2D2F34] rounded-2xl p-6 w-full max-w-sm m-4 flex flex-col text-white shadow-2xl">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-bold">Create Simple Note</h2>
+                        <button onClick={() => setIsCreateSimpleNoteModalOpen(false)} className="p-1 rounded-full hover:bg-white/10">
+                            <CloseIcon className="w-6 h-6" />
+                        </button>
+                    </div>
+                    <div className="space-y-4">
+                        <input 
+                            type="text"
+                            placeholder="Note Title"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            className="w-full bg-[#1F2125] text-white placeholder-gray-500 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50"
+                        />
+                        <div className="relative">
+                            <select
+                                value={subjectName}
+                                onChange={(e) => setSubjectName(e.target.value)}
+                                className="w-full bg-[#1F2125] text-white appearance-none border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50"
+                            >
+                                {subjects.length === 0 && <option disabled>No subjects available</option>}
+                                {subjects.map(subject => (
+                                    <option key={subject.id} value={subject.name}>{subject.name}</option>
+                                ))}
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                                <ChevronDownIcon className="text-gray-400" />
+                            </div>
+                        </div>
+                        <textarea
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            placeholder="Type your note here..."
+                            style={{ minHeight: '200px' }}
+                             className="w-full bg-[#1F2125] text-white placeholder-gray-500 border border-gray-700 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50 resize-y"
+                        />
+                    </div>
+                    <button
+                        onClick={handleSaveNote}
                         className="w-full mt-6 bg-[#A89AFF] text-black font-bold py-3 px-4 rounded-xl text-lg transition-all transform hover:scale-105 active:scale-100 shadow-lg shadow-[#A89AFF]/30"
                     >
                         Save Note
