@@ -79,7 +79,9 @@ export type Screen = 'home' | 'flashcards' | 'notes' | 'timetable' | 'settings';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [personalizationStep, setPersonalizationStep] = useState<'welcome' | 'quiz' | 'complete'>('welcome');
+  const [personalizationStep, setPersonalizationStep] = useState<'welcome' | 'quiz' | 'complete'>(() => {
+      return localStorage.getItem('onboardingComplete') === 'true' ? 'complete' : 'welcome';
+  });
   const [userName, setUserName] = useState<string>('');
   const [userAvatar, setUserAvatar] = useState<number>(8);
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
@@ -104,6 +106,7 @@ const App: React.FC = () => {
   const handlePersonalizationComplete = (data: { name: string; avatar: number }) => {
     setUserName(data.name);
     setUserAvatar(data.avatar);
+    localStorage.setItem('onboardingComplete', 'true');
     setPersonalizationStep('complete');
   };
 
