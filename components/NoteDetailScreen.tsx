@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { Note, Subject } from '../types';
 import { CameraIcon, CloseIcon, AddIcon, ArrowBackIcon, EditIcon, ChevronDownIcon } from './icons/Icons';
+import RichTextEditor from './RichTextEditor';
 
 interface NoteDetailScreenProps {
     note: Note;
@@ -103,7 +104,7 @@ const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, subjects, onB
                     </p>
                     <hr className="border-gray-700 my-4" />
                     {note.content && (
-                        <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">{note.content}</div>
+                        <div className="note-content text-gray-300 leading-relaxed" dangerouslySetInnerHTML={{ __html: note.content }} />
                     )}
                     {note.images && note.images.length > 0 && (
                         <div className="grid grid-cols-2 gap-3 mt-4">
@@ -152,12 +153,11 @@ const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, subjects, onB
                         </div>
 
                         {note.content !== undefined ? (
-                            <textarea 
-                                placeholder="Type your note here..."
+                            <RichTextEditor
                                 value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                                rows={5}
-                                className="w-full bg-[#1F2125] text-white placeholder-gray-500 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50 resize-none"
+                                onChange={setContent}
+                                placeholder="Type your note here..."
+                                minHeight="200px"
                             />
                         ) : (
                              <div className="p-2 bg-[#1F2125] border border-gray-700 rounded-lg min-h-[140px]">

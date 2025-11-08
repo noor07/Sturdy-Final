@@ -245,3 +245,23 @@ export const TrophyIcon: React.FC<{ className?: string }> = ({ className = 'h-6 
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 3H15" />
     </svg>
 );
+
+// Rich Text Editor Icons
+export const FormatBoldIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"></path></svg>
+);
+export const FormatItalicIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"></path></svg>
+);
+export const FormatListBulletedIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"></path></svg>
+);
+export const FormatListNumberedIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 11.9V11H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"></path></svg>
+);
+export const ChecklistIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="m9.55 18-5.7-5.7 1.4-1.4 4.3 4.3 9.3-9.3 1.4 1.4ZM4 22q-.825 0-1.412-.587Q2 20.825 2 20V4q0-.825.588-1.413Q3.175 2 4 2h16q.825 0 1.413.587Q22 3.175 22 4v16q0 .825-.587 1.413Q20.825 22 20 22Zm0-2h16V4H4v16ZM4 4v16V4Z"></path></svg>
+);
+export const FormatParagraphIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M11 20v-8h1.5q1.875 0 3.188-1.312Q17 9.375 17 7.5q0-1.875-1.312-3.188Q14.375 3 12.5 3H7v17h2v-7h2Z"></path></svg>
+);

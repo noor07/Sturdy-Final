@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { Subject, Note } from '../types';
 import { SearchIcon, BookIcon, CameraIcon, AddIcon, CloseIcon, TrashIcon, NotesIcon, ChevronDownIcon } from './icons/Icons';
+import RichTextEditor from './RichTextEditor';
 
 interface NotesScreenProps {
     onBack: () => void;
@@ -105,6 +106,13 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
         note.subjectName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const getPreviewText = (htmlContent?: string) => {
+        if (!htmlContent) return '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+        return tempDiv.textContent || tempDiv.innerText || '';
+    };
+
     return (
         <>
         <div className="bg-[#2D2F34] h-screen text-white font-sans relative">
@@ -140,7 +148,7 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                                     {note.images && note.images.length > 0 ? (
                                         <img src={note.images[0]} alt="Note preview" className="mt-2 rounded-lg h-32 w-full object-cover" />
                                     ) : (
-                                        <p className="text-gray-400 text-sm line-clamp-2 mt-1 h-10">{note.content}</p>
+                                        <p className="text-gray-400 text-sm line-clamp-2 mt-1 h-10">{getPreviewText(note.content)}</p>
                                     )}
                                 </button>
                                 <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-800">
@@ -233,12 +241,11 @@ const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAd
                                 <ChevronDownIcon className="text-gray-400" />
                             </div>
                         </div>
-                        <textarea 
-                            placeholder="Type your note here..."
+                        <RichTextEditor
                             value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            rows={5}
-                            className="w-full bg-[#1F2125] text-white placeholder-gray-500 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#A89AFF]/50 resize-none"
+                            onChange={setContent}
+                            placeholder="Type your note here..."
+                            minHeight="200px"
                         />
                     </div>
                     <button
