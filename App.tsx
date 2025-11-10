@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import Auth from './components/Auth';
@@ -62,9 +63,8 @@ const App: React.FC = () => {
         .eq('id', session.user.id)
         .single();
         
-      if (profileError && profileError.code !== 'PGRST116') {
-        console.error('Error fetching profile:', profileError);
-      } else if (profile) {
+      if (profile) {
+        // Profile exists, load user data and proceed
         setUserName(profile.username || '');
         setUserAvatar(profile.avatar_id || 8);
         setDailyGoal(profile.daily_goal || 6);
@@ -72,7 +72,7 @@ const App: React.FC = () => {
 
         if (profile.onboarding_complete) {
           setPersonalizationStep('complete');
-          // Fetch all other data
+          // Fetch all other app data since onboarding is done
           const [subjectsRes, notesRes, eventsRes, flashcardsRes] = await Promise.all([
             supabase.from('subjects').select('*').eq('user_id', session.user.id).order('created_at'),
             supabase.from('notes').select('*').eq('user_id', session.user.id).order('created_at', { ascending: false }),
@@ -91,12 +91,26 @@ const App: React.FC = () => {
             setFlashcardSets(sets);
           }
         } else {
+          // Onboarding not complete, send to welcome screen
           setPersonalizationStep('welcome');
         }
-      } else {
-        // New user, profile was just created
-        setPersonalizationStep('welcome');
+      } else if (profileError?.code === 'PGRST116') { // Error code for "No rows found"
+        // This is a new user whose profile doesn't exist yet. Create it.
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({ id: session.user.id, email: session.user.email });
+
+        if (insertError) {
+          console.error('Error creating profile for new user:', insertError);
+        } else {
+          // Profile created successfully, start the personalization flow
+          setPersonalizationStep('welcome');
+        }
+      } else if (profileError) {
+        // Some other error occurred when fetching profile
+        console.error('Error fetching profile:', profileError);
       }
+      
       setLoading(false);
     };
 
@@ -320,7 +334,7 @@ const App: React.FC = () => {
   if (loading) {
     return (
         <div className="bg-[#1F2125] h-screen flex items-center justify-center">
-            <LoadingSpinner />
+            <LoadingSpinner text="Loading your dashboard..." />
         </div>
     )
   }

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { supabase } from '../services/supabase';
 
@@ -15,15 +16,9 @@ const Auth: React.FC = () => {
 
         try {
             if (isSignUp) {
-                const { data, error } = await supabase.auth.signUp({ email, password });
+                const { error } = await supabase.auth.signUp({ email, password });
                 if (error) throw error;
-                if (data.user) {
-                    // Create a corresponding profile for the new user
-                    const { error: profileError } = await supabase
-                        .from('profiles')
-                        .insert({ id: data.user.id, email: data.user.email });
-                    if (profileError) throw profileError;
-                }
+                alert('Sign up successful! Please check your email to confirm your account.');
             } else {
                 const { error } = await supabase.auth.signInWithPassword({ email, password });
                 if (error) throw error;
