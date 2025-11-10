@@ -28,8 +28,8 @@ export interface Topic {
   id: string;
   name: string;
   progress: number;
-  subTopics: SubTopic[];
-  isExpanded: boolean;
+  sub_topics: SubTopic[];
+  is_expanded: boolean;
 }
 
 export interface Subject {

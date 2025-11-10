@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Avatars } from './icons/Avatars';
 import { EXAM_DATA } from '../data/exams';
 import { ChevronUpIcon, ChevronDownIcon } from './icons/Icons';
 
 interface PersonalizationQuizProps {
-  onComplete: (data: { name: string; avatar: number }) => void;
+  onComplete: (data: { name: string; avatar: number; examGoal: string; dailyGoal: number; }) => void;
 }
 
 const currentStatusOptions = [
@@ -25,7 +24,7 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
     name: '',
     birthYear: '2007',
     currentStatus: '',
-    mainGoal: '',
+    mainGoal: 'Class 12 Board Exams',
     lessonTime: '6 hours/day'
   });
 
@@ -40,6 +39,15 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
   
   const totalSteps = 4;
   const progressPercentage = (step / totalSteps) * 100;
+  
+  const handleFinalSubmit = () => {
+    onComplete({ 
+        name: userData.name, 
+        avatar: userData.avatar,
+        examGoal: userData.mainGoal,
+        dailyGoal: parseInt(userData.lessonTime) || 6,
+    });
+  };
 
   const renderStep = () => {
     switch (step) {
@@ -199,7 +207,7 @@ const PersonalizationQuiz: React.FC<PersonalizationQuizProps> = ({ onComplete })
               </div>
             </div>
             <div className="pt-6 mt-auto">
-              <button onClick={() => onComplete({ name: userData.name, avatar: userData.avatar })} className="w-full bg-white text-black font-bold py-4 px-4 rounded-full text-lg transition-transform transform hover:scale-105 active:scale-100 shadow-lg shadow-white/20">
+              <button onClick={handleFinalSubmit} className="w-full bg-white text-black font-bold py-4 px-4 rounded-full text-lg transition-transform transform hover:scale-105 active:scale-100 shadow-lg shadow-white/20">
                 Start Learning
               </button>
             </div>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import type { Subject } from '../types';
-import { ClockIcon, GraduationCapIcon, TrashIcon, ArrowBackIcon, CheckIcon, CloseIcon, AddIcon, ArrowForwardIcon, ChevronDownIcon, ChevronUpIcon } from './icons/Icons';
+import { ClockIcon, GraduationCapIcon, TrashIcon, ArrowBackIcon, CheckIcon, CloseIcon, AddIcon, ArrowForwardIcon, ChevronDownIcon, ChevronUpIcon, LogoutIcon } from './icons/Icons';
 import { EXAM_DATA } from '../data/exams';
+import { supabase } from '../services/supabase';
 
 const AddItemInput: React.FC<{ onSave: (name: string) => void, onCancel: () => void, placeholder: string }> = ({ onSave, onCancel, placeholder }) => {
     const [name, setName] = useState('');
@@ -66,6 +67,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
     const [isAddingSubject, setIsAddingSubject] = useState(false);
     const [isSelectingExamGoal, setIsSelectingExamGoal] = useState(false);
     const [expandedExam, setExpandedExam] = useState<string | null>(null);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     
     const [initialSettings, setInitialSettings] = useState({ dailyGoal, examGoal, subjects });
     const [hasChanges, setHasChanges] = useState(false);
@@ -112,6 +114,16 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
             }
         } else {
             onBack();
+        }
+    };
+    
+    const handleLogout = async () => {
+        setIsLoggingOut(true);
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            console.error("Error logging out:", error);
+            alert("Could not log out. Please try again.");
+            setIsLoggingOut(false);
         }
     };
 
@@ -193,6 +205,17 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                                 </button>
                             )}
                         </div>
+                    </section>
+
+                     <section className="mt-8">
+                        <button
+                            onClick={handleLogout}
+                            disabled={isLoggingOut}
+                            className="w-full flex items-center justify-center gap-3 bg-red-900/50 text-red-400 font-semibold py-3 px-4 rounded-xl transition-all hover:bg-red-800/60 disabled:opacity-50"
+                        >
+                            <LogoutIcon className="w-5 h-5" />
+                            {isLoggingOut ? 'Logging Out...' : 'Log Out'}
+                        </button>
                     </section>
                 </main>
             </div>

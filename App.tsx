@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import Auth from './components/Auth';
@@ -15,6 +14,7 @@ import type { Subject, Note, TimetableEvent, FlashcardSet, Flashcard, Topic } fr
 import { generateFlashcards as generateFlashcardsFromAPI } from './services/geminiService';
 import { supabase } from './services/supabase';
 import LoadingSpinner from './components/LoadingSpinner';
+import { SYLLABUS_DATA } from './data/syllabusData';
 
 export type Screen = 'home' | 'flashcards' | 'notes' | 'timetable' | 'settings';
 
@@ -121,17 +121,79 @@ const App: React.FC = () => {
   const handleStartPersonalization = () => {
     setPersonalizationStep('quiz');
   };
+  
+  const seedInitialSubjects = async (session: Session, goal: string) => {
+    const syllabus = SYLLABUS_DATA[goal];
+    if (!syllabus) {
+        console.warn(`No syllabus data found for exam goal: ${goal}`);
+        return;
+    }
 
-  const handlePersonalizationComplete = async (data: { name: string; avatar: number }) => {
+    const subjectsToInsert = syllabus.map(subjectData => ({
+        name: subjectData.name,
+        user_id: session.user.id,
+        progress: 0,
+        time_spent: '00h 00m',
+        is_expanded: true,
+        topics: subjectData.topics.map((topicData, tIndex) => ({
+            id: `topic-${subjectData.name.replace(/\s+/g, '-')}-${tIndex}-${Date.now()}`,
+            name: topicData.name,
+            progress: 0,
+            is_expanded: true,
+            sub_topics: topicData.subTopics.map((subTopicData, stIndex) => ({
+                id: `subtopic-${topicData.name.replace(/\s+/g, '-')}-${stIndex}-${Date.now()}`,
+                name: subTopicData.name,
+                completed: false,
+            })),
+        })),
+    }));
+
+    const { error } = await supabase.from('subjects').insert(subjectsToInsert);
+    
+    if (error) {
+        console.error('Error seeding subjects:', error);
+    }
+  };
+
+
+  const handlePersonalizationComplete = async (data: { name: string; avatar: number; examGoal: string; dailyGoal: number; }) => {
     if (!session) return;
+    
     setUserName(data.name);
     setUserAvatar(data.avatar);
-    const { error } = await supabase
+    setExamGoal(data.examGoal);
+    setDailyGoal(data.dailyGoal);
+
+    const { error: profileUpdateError } = await supabase
       .from('profiles')
-      .update({ username: data.name, avatar_id: data.avatar, onboarding_complete: true })
+      .update({ 
+          username: data.name, 
+          avatar_id: data.avatar, 
+          exam_goal: data.examGoal,
+          daily_goal: data.dailyGoal,
+          onboarding_complete: true 
+      })
       .eq('id', session.user.id);
       
-    if (error) console.error("Error saving personalization", error);
+    if (profileUpdateError) {
+        console.error("Error saving personalization", profileUpdateError);
+    } else {
+        await seedInitialSubjects(session, data.examGoal);
+        
+        // Re-fetch subjects from DB to ensure state is consistent after seeding
+        const { data: subjectsData, error: subjectsError } = await supabase
+            .from('subjects')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .order('created_at');
+            
+        if (subjectsError) {
+            console.error("Error fetching subjects after seeding:", subjectsError);
+        } else if (subjectsData) {
+            setSubjects(subjectsData as Subject[]);
+        }
+    }
+
     setPersonalizationStep('complete');
   };
 
@@ -276,6 +338,7 @@ const App: React.FC = () => {
                 userName={userName} 
                 userAvatar={userAvatar}
                 subjects={subjects}
+                onAddSubject={handleAddSubject}
                 onUpdateSubject={handleUpdateSubject}
                 onNavigateToSettings={() => setCurrentScreen('settings')}
                 events={timetableEvents}
@@ -324,6 +387,7 @@ const App: React.FC = () => {
                 userName={userName} 
                 userAvatar={userAvatar}
                 subjects={subjects}
+                onAddSubject={handleAddSubject}
                 onUpdateSubject={handleUpdateSubject}
                 onNavigateToSettings={() => setCurrentScreen('settings')}
                 events={timetableEvents}

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import type { Subject, TimetableEvent } from '../types';
+import type { Subject, TimetableEvent, Topic, SubTopic } from '../types';
 import { Avatars } from './icons/Avatars';
 import { SettingsIcon, EditIcon, ChevronDownIcon, ChevronUpIcon, PlayArrowIcon, CheckIcon, AddIcon, CloseIcon } from './icons/Icons';
 
@@ -34,7 +34,7 @@ const CircularProgress: React.FC<{ progress: number, size?: number, strokeWidth?
         />
       </svg>
       <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-semibold">
-        {progress}%
+        {Math.round(progress)}%
       </span>
     </div>
   );
@@ -65,7 +65,6 @@ const AddItemInput: React.FC<{ onSave: (name: string) => void, onCancel: () => v
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onKeyDown={handleKeyDown}
-                onBlur={onCancel}
                 placeholder={placeholder}
                 className="bg-transparent focus:outline-none text-sm flex-1 placeholder-gray-500"
             />
@@ -79,14 +78,16 @@ interface HomeScreenProps {
     userName: string;
     userAvatar: number;
     subjects: Subject[];
+    onAddSubject: (name: string) => void;
     onUpdateSubject: (subject: Subject) => void;
     onNavigateToSettings: () => void;
     events: TimetableEvent[];
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects, onUpdateSubject, onNavigateToSettings, events }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects, onAddSubject, onUpdateSubject, onNavigateToSettings, events }) => {
     const [activeDate, setActiveDate] = useState<number>(18);
     const [addingState, setAddingState] = useState<{ type: 'topic' | 'subtopic'; parentId: string } | null>(null);
+    const [isAddingSubject, setIsAddingSubject] = useState(false);
     
     const { eventToShow, eventStatus } = useMemo(() => {
         const now = new Date();
@@ -127,7 +128,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
     const toggleTopic = (subjectId: string, topicId: string) => {
         const subject = subjects.find(s => s.id === subjectId);
         if (subject) {
-            const updatedTopics = subject.topics.map(t => t.id === topicId ? { ...t, isExpanded: !t.isExpanded } : t);
+            const updatedTopics = subject.topics.map(t => t.id === topicId ? { ...t, is_expanded: !t.is_expanded } : t);
             onUpdateSubject({ ...subject, topics: updatedTopics });
         }
     };
@@ -135,12 +136,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
     const handleAddTopic = (subjectId: string, name: string) => {
         const subject = subjects.find(s => s.id === subjectId);
         if (subject) {
-            const newTopic = {
+            const newTopic: Topic = {
                 id: `topic-${Date.now()}`,
                 name,
                 progress: 0,
-                isExpanded: true,
-                subTopics: []
+                is_expanded: true,
+                sub_topics: []
             };
             const updatedTopics = [...subject.topics, newTopic];
             onUpdateSubject({ ...subject, topics: updatedTopics });
@@ -153,12 +154,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
         if (subject) {
             const updatedTopics = subject.topics.map(t => {
                 if (t.id === topicId) {
-                    const newSubTopic = {
+                    const newSubTopic: SubTopic = {
                         id: `subtopic-${Date.now()}`,
                         name,
                         completed: false
                     };
-                    return { ...t, subTopics: [...t.subTopics, newSubTopic] };
+                    return { ...t, sub_topics: [...t.sub_topics, newSubTopic] };
                 }
                 return t;
             });
@@ -271,16 +272,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
                                          <div className="flex items-center gap-1">
                                             <button className="p-1 rounded-full hover:bg-white/10 transition-colors"><EditIcon className="w-4 h-4 text-gray-400" /></button>
                                             <button onClick={() => toggleTopic(subject.id, topic.id)} className="flex items-center text-gray-400 text-xs gap-1 hover:text-white transition-colors">
-                                                 Hide Details {topic.isExpanded ? <ChevronUpIcon className="w-5 h-5"/> : <ChevronDownIcon className="w-5 h-5"/>}
+                                                 Hide Details {topic.is_expanded ? <ChevronUpIcon className="w-5 h-5"/> : <ChevronDownIcon className="w-5 h-5"/>}
                                             </button>
                                         </div>
                                    </div>
                                     <div className="w-full bg-gray-700 rounded-full h-1 mt-3">
                                         <div className="bg-[#34D399] h-1 rounded-full" style={{ width: `${topic.progress}%` }}></div>
                                     </div>
-                                   {topic.isExpanded && (
+                                   {topic.is_expanded && (
                                        <div className="mt-3 space-y-2">
-                                           {topic.subTopics.map(subTopic => (
+                                           {topic.sub_topics.map(subTopic => (
                                                // Topic Item (e.g., "New Topic"). This is a "SubTopic" in the code.
                                                <div key={subTopic.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5">
                                                    <div className="flex-1 mr-2">
@@ -337,6 +338,31 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
                     )}
                 </div>
             ))}
+            
+            <div className="mt-6">
+                {isAddingSubject ? (
+                    <AddItemInput
+                        onSave={(name) => {
+                            onAddSubject(name);
+                            setIsAddingSubject(false);
+                        }}
+                        onCancel={() => setIsAddingSubject(false)}
+                        placeholder="New Subject Name..."
+                    />
+                ) : (
+                    <button
+                        onClick={() => setIsAddingSubject(true)}
+                        style={{
+                            background: 'rgba(34, 36, 40, 1)',
+                            border: '1px solid rgba(168, 154, 255, 0.3)',
+                            boxShadow: '0 4px 15px rgba(168, 154, 255, 0.1)',
+                        }}
+                        className="w-full flex items-center justify-center gap-2 py-3 mt-2 text-sm font-semibold text-[#C6BEFF] rounded-xl hover:shadow-[#A89AFF]/20 hover:border-[#A89AFF]/50 transition-all duration-300 transform active:scale-95"
+                    >
+                        <AddIcon className="w-4 h-4" /> Add Subject
+                    </button>
+                )}
+            </div>
         </main>
       </div>
     </div>
