@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import type { Subject } from '../types';
+import { UserData } from '../App';
 import { ClockIcon, GraduationCapIcon, TrashIcon, ArrowBackIcon, CheckIcon, CloseIcon, AddIcon, ArrowForwardIcon, ChevronDownIcon, ChevronUpIcon, LogoutIcon } from './icons/Icons';
 import { EXAM_DATA } from '../data/exams';
-import { supabase } from '../services/supabase';
 
 const AddItemInput: React.FC<{ onSave: (name: string) => void, onCancel: () => void, placeholder: string }> = ({ onSave, onCancel, placeholder }) => {
     const [name, setName] = useState('');
@@ -40,49 +40,32 @@ const AddItemInput: React.FC<{ onSave: (name: string) => void, onCancel: () => v
 };
 
 interface SettingsScreenProps {
-    subjects: Subject[];
-    dailyGoal: number;
-    examGoal: string;
+    userData: UserData;
     onAddSubject: (name: string) => void;
     onDeleteSubject: (id: string) => void;
     onBack: () => void;
-    onDailyGoalChange: (goal: number) => void;
     onExamGoalChange: (goal: string) => void;
-    onUpdateProfile: (data: { daily_goal?: number; exam_goal?: string }) => Promise<void>;
-    setSubjects: (subjects: Subject[]) => void;
+    onUpdateProfile: (data: { daily_goal?: number }) => void;
+    onLogout: () => void;
 }
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ 
-    subjects, 
-    dailyGoal,
-    examGoal,
+    userData,
     onAddSubject, 
     onDeleteSubject, 
     onBack,
-    onDailyGoalChange,
     onExamGoalChange,
     onUpdateProfile,
-    setSubjects,
+    onLogout,
 }) => {
+    const { subjects, profile } = userData;
+    const { daily_goal: dailyGoal, exam_goal: examGoal } = profile;
+    
     const [isAddingSubject, setIsAddingSubject] = useState(false);
     const [isSelectingExamGoal, setIsSelectingExamGoal] = useState(false);
     const [expandedExam, setExpandedExam] = useState<string | null>(null);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     
-    const [initialSettings, setInitialSettings] = useState({ dailyGoal, examGoal, subjects });
-    const [hasChanges, setHasChanges] = useState(false);
-    const [showSavedMessage, setShowSavedMessage] = useState(false);
-
-    useEffect(() => {
-        // Check if current state differs from initial state
-        const changesExist =
-            dailyGoal !== initialSettings.dailyGoal ||
-            examGoal !== initialSettings.examGoal ||
-            JSON.stringify(subjects) !== JSON.stringify(initialSettings.subjects);
-        setHasChanges(changesExist);
-    }, [dailyGoal, examGoal, subjects, initialSettings]);
-
-
     const subjectColors = ['#F87171', '#FBBF24', '#C084FC', '#60A5FA', '#34D399', '#FB923C'];
 
     const handleSaveSubject = (name: string) => {
@@ -91,48 +74,23 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
     };
     
     const handleSelectExamGoal = (goal: string) => {
-        onExamGoalChange(goal);
         setIsSelectingExamGoal(false);
         setExpandedExam(null);
-    };
-
-    const handleSave = async () => {
-        await onUpdateProfile({ daily_goal: dailyGoal, exam_goal: examGoal });
-        setInitialSettings({ dailyGoal, examGoal, subjects });
-        setShowSavedMessage(true);
-        setTimeout(() => setShowSavedMessage(false), 2000);
+        onExamGoalChange(goal);
     };
     
-    const handleBack = () => {
-        if (hasChanges) {
-            if (window.confirm('You have unsaved changes. Are you sure you want to leave?')) {
-                // Revert changes to their initial state before navigating back
-                onDailyGoalChange(initialSettings.dailyGoal);
-                onExamGoalChange(initialSettings.examGoal);
-                setSubjects(initialSettings.subjects);
-                onBack();
-            }
-        } else {
-            onBack();
+    const handleLogout = () => {
+        if (window.confirm('Are you sure you want to log out? All your data on this device will be cleared.')) {
+            setIsLoggingOut(true);
+            onLogout();
         }
     };
-    
-    const handleLogout = async () => {
-        setIsLoggingOut(true);
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-            console.error("Error logging out:", error);
-            alert("Could not log out. Please try again.");
-            setIsLoggingOut(false);
-        }
-    };
-
 
     return (
         <div className="bg-[#1F2125] h-screen text-white font-sans">
             <div className="p-4 max-w-md mx-auto h-full overflow-y-auto no-scrollbar pb-28">
                 <header className="flex items-center py-4 relative justify-center">
-                    <button onClick={handleBack} className="absolute left-0 p-2 rounded-full hover:bg-white/10 transition-all duration-200 transform active:scale-90">
+                    <button onClick={onBack} className="absolute left-0 p-2 rounded-full hover:bg-white/10 transition-all duration-200 transform active:scale-90">
                         <ArrowBackIcon className="text-gray-300 w-5 h-5" />
                     </button>
                     <h1 className="text-lg font-bold">Settings</h1>
@@ -158,7 +116,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                                 max="16"
                                 step="2"
                                 value={dailyGoal}
-                                onChange={(e) => onDailyGoalChange(Number(e.target.value))}
+                                onChange={(e) => onUpdateProfile({ daily_goal: Number(e.target.value) })}
                                 className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer range-thumb"
                             />
 
@@ -214,7 +172,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                             className="w-full flex items-center justify-center gap-3 bg-red-900/50 text-red-400 font-semibold py-3 px-4 rounded-xl transition-all hover:bg-red-800/60 disabled:opacity-50"
                         >
                             <LogoutIcon className="w-5 h-5" />
-                            {isLoggingOut ? 'Logging Out...' : 'Log Out'}
+                            {isLoggingOut ? 'Clearing Data...' : 'Log Out & Reset App'}
                         </button>
                     </section>
                 </main>
@@ -281,25 +239,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                     </div>
                 </div>
             )}
-
-            {/* Save Button */}
-            {hasChanges && (
-                <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 z-20 bg-gradient-to-t from-[#1F2125] via-[#1F2125] to-transparent">
-                    <button
-                        onClick={handleSave}
-                        disabled={showSavedMessage}
-                        className="w-full bg-[#A89AFF] disabled:bg-green-500 text-black font-bold py-3 px-4 rounded-full text-lg transition-all transform hover:scale-105 active:scale-100 shadow-lg shadow-[#A89AFF]/30"
-                    >
-                         {showSavedMessage ? (
-                            <span className="flex items-center justify-center">
-                                <CheckIcon className="w-5 h-5 mr-2 text-black" />
-                                Saved!
-                            </span>
-                        ) : 'Save Changes'}
-                    </button>
-                </div>
-            )}
-
 
              <style>{`
                 .range-thumb::-webkit-slider-thumb {

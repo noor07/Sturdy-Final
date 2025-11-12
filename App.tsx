@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import type { Session } from '@supabase/supabase-js';
-import Auth from './components/Auth';
 import PersonalizationWelcome from './components/PersonalizationWelcome';
 import PersonalizationQuiz from './components/PersonalizationQuiz';
 import HomeScreen from './components/HomeScreen';
@@ -12,321 +10,267 @@ import BottomNavBar from './components/BottomNavBar';
 import NoteDetailScreen from './components/NoteDetailScreen';
 import type { Subject, Note, TimetableEvent, FlashcardSet, Flashcard, Topic } from './types';
 import { generateFlashcards as generateFlashcardsFromAPI } from './services/geminiService';
-import { supabase } from './services/supabase';
 import LoadingSpinner from './components/LoadingSpinner';
 import { SYLLABUS_DATA } from './data/syllabusData';
 
 export type Screen = 'home' | 'flashcards' | 'notes' | 'timetable' | 'settings';
 
+interface Profile {
+    username: string;
+    avatar_id: number;
+    daily_goal: number;
+    exam_goal: string;
+    onboarding_complete: boolean;
+}
+
+export interface UserData {
+    profile: Profile;
+    subjects: Subject[];
+    notes: Note[];
+    timetableEvents: TimetableEvent[];
+    flashcardSets: Record<string, FlashcardSet>;
+}
+
 const App: React.FC = () => {
-  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [personalizationStep, setPersonalizationStep] = useState<'welcome' | 'quiz' | 'complete' | 'pending'>('pending');
   
-  const [userName, setUserName] = useState<string>('');
-  const [userAvatar, setUserAvatar] = useState<number>(8);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [dailyGoal, setDailyGoal] = useState(6);
-  const [examGoal, setExamGoal] = useState('Class 12 Board Exams');
-  const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
-  const [timetableEvents, setTimetableEvents] = useState<TimetableEvent[]>([]);
   const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
-  const [flashcardSets, setFlashcardSets] = useState<Record<string, FlashcardSet>>({});
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      // Initial loading is handled in the data fetch effect
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
    useEffect(() => {
-    const fetchInitialData = async () => {
-      if (!session) {
-        setLoading(false);
-        setPersonalizationStep('pending');
-        return;
-      }
-
-      setLoading(true);
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-        
-      if (profile) {
-        // Profile exists, load user data and proceed
-        setUserName(profile.username || '');
-        setUserAvatar(profile.avatar_id || 8);
-        setDailyGoal(profile.daily_goal || 6);
-        setExamGoal(profile.exam_goal || 'Class 12 Board Exams');
-
-        if (profile.onboarding_complete) {
-          setPersonalizationStep('complete');
-          // Fetch all other app data since onboarding is done
-          const [subjectsRes, notesRes, eventsRes, flashcardsRes] = await Promise.all([
-            supabase.from('subjects').select('*').eq('user_id', session.user.id).order('created_at'),
-            supabase.from('notes').select('*').eq('user_id', session.user.id).order('created_at', { ascending: false }),
-            supabase.from('timetable_events').select('*').eq('user_id', session.user.id),
-            supabase.from('flashcard_sets').select('*').eq('user_id', session.user.id),
-          ]);
-
-          if (subjectsRes.data) setSubjects(subjectsRes.data as Subject[]);
-          if (notesRes.data) setNotes(notesRes.data as Note[]);
-          if (eventsRes.data) setTimetableEvents(eventsRes.data as TimetableEvent[]);
-          if (flashcardsRes.data) {
-            const sets = flashcardsRes.data.reduce((acc, set) => {
-                acc[set.topic_id] = set as FlashcardSet;
-                return acc;
-            }, {} as Record<string, FlashcardSet>);
-            setFlashcardSets(sets);
-          }
+    setLoading(true);
+    try {
+      const storedData = localStorage.getItem('studyfy_data');
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        if (parsedData.profile?.onboarding_complete) {
+            setUserData(parsedData);
+            setPersonalizationStep('complete');
         } else {
-          // Onboarding not complete, send to welcome screen
-          setPersonalizationStep('welcome');
+             setPersonalizationStep('welcome');
         }
-      } else if (profileError?.code === 'PGRST116') { // Error code for "No rows found"
-        // This is a new user whose profile doesn't exist yet. Create it.
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert({ id: session.user.id, email: session.user.email });
-
-        if (insertError) {
-          console.error('Error creating profile for new user:', insertError);
-        } else {
-          // Profile created successfully, start the personalization flow
-          setPersonalizationStep('welcome');
-        }
-      } else if (profileError) {
-        // Some other error occurred when fetching profile
-        console.error('Error fetching profile:', profileError);
+      } else {
+        setPersonalizationStep('welcome');
       }
-      
+    } catch (error) {
+      console.error("Failed to load data from local storage", error);
+      setPersonalizationStep('welcome');
+    } finally {
       setLoading(false);
-    };
+    }
+  }, []);
 
-    fetchInitialData();
-  }, [session]);
-
+  const updateUserData = (newUserData: UserData) => {
+      localStorage.setItem('studyfy_data', JSON.stringify(newUserData));
+      setUserData(newUserData);
+  };
 
   const handleStartPersonalization = () => {
     setPersonalizationStep('quiz');
   };
   
-  const seedInitialSubjects = async (session: Session, goal: string) => {
+  const seedInitialSubjects = (goal: string): Subject[] => {
     const syllabus = SYLLABUS_DATA[goal];
-    if (!syllabus) {
-        console.warn(`No syllabus data found for exam goal: ${goal}`);
-        return;
-    }
+    if (!syllabus) return [];
 
-    const subjectsToInsert = syllabus.map(subjectData => ({
+    return syllabus.map(subjectData => ({
+        id: crypto.randomUUID(),
+        created_at: new Date().toISOString(),
         name: subjectData.name,
-        user_id: session.user.id,
         progress: 0,
         time_spent: '00h 00m',
         is_expanded: true,
-        topics: subjectData.topics.map((topicData, tIndex) => ({
-            id: `topic-${subjectData.name.replace(/\s+/g, '-')}-${tIndex}-${Date.now()}`,
+        topics: subjectData.topics.map((topicData) => ({
+            id: crypto.randomUUID(),
             name: topicData.name,
             progress: 0,
             is_expanded: true,
-            sub_topics: topicData.subTopics.map((subTopicData, stIndex) => ({
-                id: `subtopic-${topicData.name.replace(/\s+/g, '-')}-${stIndex}-${Date.now()}`,
+            sub_topics: topicData.subTopics.map((subTopicData) => ({
+                id: crypto.randomUUID(),
                 name: subTopicData.name,
                 completed: false,
             })),
         })),
     }));
-
-    const { error } = await supabase.from('subjects').insert(subjectsToInsert);
-    
-    if (error) {
-        console.error('Error seeding subjects:', error);
-    }
   };
 
-
-  const handlePersonalizationComplete = async (data: { name: string; avatar: number; examGoal: string; dailyGoal: number; }) => {
-    if (!session) return;
+  const handlePersonalizationComplete = (data: { name: string; avatar: number; examGoal: string; dailyGoal: number; }) => {
+    const newSubjects = seedInitialSubjects(data.examGoal);
+    const newProfile: Profile = {
+        username: data.name,
+        avatar_id: data.avatar,
+        daily_goal: data.dailyGoal,
+        exam_goal: data.examGoal,
+        onboarding_complete: true
+    };
     
-    setUserName(data.name);
-    setUserAvatar(data.avatar);
-    setExamGoal(data.examGoal);
-    setDailyGoal(data.dailyGoal);
+    const newUserData: UserData = {
+        profile: newProfile,
+        subjects: newSubjects,
+        notes: [],
+        timetableEvents: [],
+        flashcardSets: {},
+    };
 
-    const { error: profileUpdateError } = await supabase
-      .from('profiles')
-      .update({ 
-          username: data.name, 
-          avatar_id: data.avatar, 
-          exam_goal: data.examGoal,
-          daily_goal: data.dailyGoal,
-          onboarding_complete: true 
-      })
-      .eq('id', session.user.id);
-      
-    if (profileUpdateError) {
-        console.error("Error saving personalization", profileUpdateError);
-    } else {
-        await seedInitialSubjects(session, data.examGoal);
-        
-        // Re-fetch subjects from DB to ensure state is consistent after seeding
-        const { data: subjectsData, error: subjectsError } = await supabase
-            .from('subjects')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .order('created_at');
-            
-        if (subjectsError) {
-            console.error("Error fetching subjects after seeding:", subjectsError);
-        } else if (subjectsData) {
-            setSubjects(subjectsData as Subject[]);
-        }
-    }
-
+    updateUserData(newUserData);
     setPersonalizationStep('complete');
   };
 
-  const handleAddSubject = async (name: string) => {
-    if (!session) return;
-    // FIX: Removed 'progress' from Omit<> so it can be included in the newSubject object. The previous type omitted 'progress', but the object literal included it, causing a type mismatch.
-    const newSubject: Omit<Subject, 'id' | 'created_at' | 'topics'> & { user_id: string; topics: Topic[] } = {
+  const handleAddSubject = (name: string) => {
+    if (!userData) return;
+    const newSubject: Subject = {
+        id: crypto.randomUUID(),
+        created_at: new Date().toISOString(),
         name,
         progress: 0,
         time_spent: '00h 00m',
         is_expanded: true,
         topics: [],
-        user_id: session.user.id
     };
-    const { data, error } = await supabase.from('subjects').insert(newSubject).select().single();
-    if (error) console.error('Error adding subject', error);
-    else if (data) setSubjects(prev => [...prev, data as Subject]);
+    updateUserData({ ...userData, subjects: [...userData.subjects, newSubject] });
   };
 
-  const handleDeleteSubject = async (id: string) => {
-      if (!session) return;
-      const { error } = await supabase.from('subjects').delete().eq('id', id);
-      if (error) console.error('Error deleting subject', error);
-      else setSubjects(prev => prev.filter(s => s.id !== id));
+  const handleDeleteSubject = (id: string) => {
+    if (!userData) return;
+    updateUserData({ ...userData, subjects: userData.subjects.filter(s => s.id !== id) });
   };
   
-  const handleUpdateSubject = async (updatedSubject: Subject) => {
-    if (!session) return;
-    const { id, ...updateData } = updatedSubject;
-    const { error } = await supabase.from('subjects').update(updateData).eq('id', id);
-    if (error) console.error('Error updating subject', error);
-    else setSubjects(prev => prev.map(s => s.id === id ? updatedSubject : s));
+  const handleUpdateSubject = (updatedSubject: Subject) => {
+    if (!userData) return;
+    updateUserData({ ...userData, subjects: userData.subjects.map(s => s.id === updatedSubject.id ? updatedSubject : s) });
   };
 
-  const handleAddNote = async (newNoteData: Omit<Note, 'id' | 'created_at'>) => {
-    if (!session) return;
-    const noteToInsert = { ...newNoteData, user_id: session.user.id };
-    const { data, error } = await supabase.from('notes').insert(noteToInsert).select().single();
-    if (error) console.error('Error adding note', error);
-    else if (data) setNotes(prev => [data as Note, ...prev]);
+  const handleAddNote = (newNoteData: Omit<Note, 'id' | 'created_at'>) => {
+    if (!userData) return;
+    const newNote: Note = {
+        ...newNoteData,
+        id: crypto.randomUUID(),
+        created_at: new Date().toISOString(),
+    };
+    updateUserData({ ...userData, notes: [newNote, ...userData.notes] });
   };
   
-  const handleDeleteNote = async (noteId: string) => {
+  const handleDeleteNote = (noteId: string) => {
+    if (!userData) return;
     if (window.confirm('Are you sure you want to delete this note?')) {
-        if (!session) return;
-        const { error } = await supabase.from('notes').delete().eq('id', noteId);
-        if (error) console.error('Error deleting note', error);
-        else setNotes(prev => prev.filter(n => n.id !== noteId));
+        updateUserData({ ...userData, notes: userData.notes.filter(n => n.id !== noteId) });
     }
   };
 
-  const handleUpdateNote = async (noteId: string, updatedData: Partial<Omit<Note, 'id' | 'created_at'>>) => {
-      if (!session) return;
-      const { data, error } = await supabase.from('notes').update(updatedData).eq('id', noteId).select().single();
-      if (error) console.error('Error updating note', error);
-      else if (data) {
-          const updatedNote = data as Note;
-          setNotes(prev => prev.map(n => (n.id === noteId ? updatedNote : n)));
-          setSelectedNote(updatedNote);
-      }
+  const handleUpdateNote = (noteId: string, updatedData: Partial<Omit<Note, 'id' | 'created_at'>>) => {
+      if (!userData) return;
+      const newNotes = userData.notes.map(n => (n.id === noteId ? { ...n, ...updatedData } : n));
+      updateUserData({ ...userData, notes: newNotes });
+      setSelectedNote(prev => prev ? { ...prev, ...updatedData } as Note : null);
   };
   
-  const handleAddEvent = async (newEventData: Omit<TimetableEvent, 'id'>) => {
-    if (!session) return;
-    const eventToInsert = { ...newEventData, user_id: session.user.id };
-    const { data, error } = await supabase.from('timetable_events').insert(eventToInsert).select().single();
-    if (error) console.error('Error adding event', error);
-    else if (data) setTimetableEvents(prev => [...prev, data as TimetableEvent]);
+  const handleAddEvent = (newEventData: Omit<TimetableEvent, 'id'>) => {
+    if (!userData) return;
+    const newEvent: TimetableEvent = { ...newEventData, id: crypto.randomUUID() };
+    updateUserData({ ...userData, timetableEvents: [...userData.timetableEvents, newEvent] });
     setIsAddEventModalOpen(false);
   };
 
-  const handleUpdateEvent = async (eventId: string, updatedData: Partial<Omit<TimetableEvent, 'id'>>) => {
-    if (!session) return;
-    const { data, error } = await supabase.from('timetable_events').update(updatedData).eq('id', eventId).select().single();
-    if (error) console.error('Error updating event', error);
-    else if (data) setTimetableEvents(prev => prev.map(e => (e.id === eventId ? data as TimetableEvent : e)));
+  const handleUpdateEvent = (eventId: string, updatedData: Partial<Omit<TimetableEvent, 'id'>>) => {
+    if (!userData) return;
+    const newEvents = userData.timetableEvents.map(e => (e.id === eventId ? { ...e, ...updatedData } : e));
+    updateUserData({ ...userData, timetableEvents: newEvents });
   };
 
-  const handleDeleteEvent = async (eventId: string) => {
-      if (!session) return;
-      const { error } = await supabase.from('timetable_events').delete().eq('id', eventId);
-      if (error) console.error('Error deleting event', error);
-      else setTimetableEvents(prev => prev.filter(e => e.id !== eventId));
+  const handleDeleteEvent = (eventId: string) => {
+      if (!userData) return;
+      updateUserData({ ...userData, timetableEvents: userData.timetableEvents.filter(e => e.id !== eventId) });
   };
 
   const handleGenerateFlashcards = async (topicId: string, topicName: string, subjectName: string) => {
-      if (!session) return;
-      const existingSet = flashcardSets[topicId];
+      if (!userData) return;
+      const existingSet = userData.flashcardSets[topicId];
       const existingQuestions = existingSet ? existingSet.cards.map(c => c.question) : [];
       
       const newCards = await generateFlashcardsFromAPI(topicName, existingQuestions);
       
-      const updatedSet: Omit<FlashcardSet, 'user_id'> & { user_id: string } = {
+      const updatedSet: FlashcardSet = {
         topic_id: topicId,
-        user_id: session.user.id,
         topic_name: topicName,
         subject_name: subjectName,
         score: existingSet?.score || 0,
         cards: [...(existingSet?.cards || []), ...newCards],
       };
-
-      const { error } = await supabase.from('flashcard_sets').upsert(updatedSet, { onConflict: 'topic_id,user_id' });
-      if (error) console.error('Error saving flashcards', error);
-      else setFlashcardSets(prev => ({...prev, [topicId]: updatedSet as FlashcardSet }));
+      
+      const newFlashcardSets = { ...userData.flashcardSets, [topicId]: updatedSet };
+      updateUserData({ ...userData, flashcardSets: newFlashcardSets });
   };
 
-  const handleUpdateFlashcardScore = async (topicId: string, pointsToAdd: number) => {
-      if (!session) return;
-      const existingSet = flashcardSets[topicId];
+  const handleUpdateFlashcardScore = (topicId: string, pointsToAdd: number) => {
+      if (!userData) return;
+      const existingSet = userData.flashcardSets[topicId];
       if (existingSet) {
           const newScore = existingSet.score + pointsToAdd;
-          const { error } = await supabase.from('flashcard_sets').update({ score: newScore }).match({ topic_id: topicId, user_id: session.user.id });
-          if (error) console.error('Error updating score', error);
-          else setFlashcardSets(prev => ({ ...prev, [topicId]: { ...existingSet, score: newScore } }));
+          const updatedSet = { ...existingSet, score: newScore };
+          const newFlashcardSets = { ...userData.flashcardSets, [topicId]: updatedSet };
+          updateUserData({ ...userData, flashcardSets: newFlashcardSets });
       }
   };
   
-  const handleUpdateProfile = async (data: { daily_goal?: number; exam_goal?: string }) => {
-    if (!session) return;
-    const { error } = await supabase.from('profiles').update(data).eq('id', session.user.id);
-    if (error) {
-      console.error("Error updating profile", error);
-    } else {
-      if(data.daily_goal) setDailyGoal(data.daily_goal);
-      if(data.exam_goal) setExamGoal(data.exam_goal);
+  const handleUpdateProfile = (data: Partial<Profile>) => {
+    if (!userData) return;
+    const newProfile = { ...userData.profile, ...data };
+    updateUserData({ ...userData, profile: newProfile });
+  };
+  
+  const handleExamGoalChange = (newGoal: string) => {
+    if (!userData || newGoal === userData.profile.exam_goal) return;
+
+    const confirmed = window.confirm(
+        'Changing your exam goal will replace all your current subjects and progress with the syllabus for the new goal. This action cannot be undone. Are you sure you want to continue?'
+    );
+
+    if (confirmed) {
+        const newSubjects = seedInitialSubjects(newGoal);
+        const newUserData = {
+            ...userData,
+            subjects: newSubjects,
+            profile: { ...userData.profile, exam_goal: newGoal }
+        };
+        updateUserData(newUserData);
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('studyfy_data');
+    window.location.reload();
+  };
+
+  if (loading) {
+    return (
+        <div className="bg-[#1F2125] h-screen flex items-center justify-center">
+            <LoadingSpinner text="Initializing..." />
+        </div>
+    )
+  }
+
+  if (personalizationStep !== 'complete' || !userData) {
+    if (personalizationStep === 'welcome') {
+      return <PersonalizationWelcome onReady={handleStartPersonalization} />;
+    }
+    if (personalizationStep === 'quiz') {
+      return <PersonalizationQuiz onComplete={handlePersonalizationComplete} />;
+    }
+    return (
+        <div className="bg-[#1F2125] h-screen flex items-center justify-center">
+            <LoadingSpinner text="Initializing..." />
+        </div>
+    );
+  }
+  
   const renderScreen = () => {
     if (selectedNote) {
         return <NoteDetailScreen
             note={selectedNote}
-            subjects={subjects}
+            userData={userData}
             onBack={() => setSelectedNote(null)}
             onUpdateNote={handleUpdateNote}
         />
@@ -335,47 +279,39 @@ const App: React.FC = () => {
     switch(currentScreen) {
         case 'home':
             return <HomeScreen 
-                userName={userName} 
-                userAvatar={userAvatar}
-                subjects={subjects}
+                userData={userData}
                 onAddSubject={handleAddSubject}
                 onUpdateSubject={handleUpdateSubject}
                 onNavigateToSettings={() => setCurrentScreen('settings')}
-                events={timetableEvents}
             />;
         case 'settings':
              return <SettingsScreen 
-                subjects={subjects}
-                dailyGoal={dailyGoal}
-                examGoal={examGoal}
+                userData={userData}
                 onAddSubject={handleAddSubject}
                 onDeleteSubject={handleDeleteSubject}
                 onBack={() => setCurrentScreen('home')}
-                onDailyGoalChange={setDailyGoal}
-                onExamGoalChange={setExamGoal}
-                onUpdateProfile={handleUpdateProfile}
-                setSubjects={setSubjects} 
+                onExamGoalChange={handleExamGoalChange}
+                onUpdateProfile={(data) => handleUpdateProfile({ daily_goal: data.daily_goal })}
+                onLogout={handleLogout}
             />
         case 'flashcards':
             return <FlashcardsScreen 
-                subjects={subjects}
-                flashcardSets={flashcardSets}
+                userData={userData}
                 onGenerate={handleGenerateFlashcards}
                 onUpdateScore={handleUpdateFlashcardScore}
             />;
         case 'notes':
             return <NotesScreen 
+                userData={userData}
                 onBack={() => setCurrentScreen('home')} 
-                subjects={subjects}
-                notes={notes}
                 onAddNote={handleAddNote}
                 onSelectNote={setSelectedNote}
                 onDeleteNote={handleDeleteNote}
             />;
         case 'timetable':
             return <TimetableScreen 
+                userData={userData}
                 onBack={() => setCurrentScreen('home')} 
-                events={timetableEvents} 
                 onAddEvent={handleAddEvent}
                 onUpdateEvent={handleUpdateEvent}
                 onDeleteEvent={handleDeleteEvent}
@@ -384,41 +320,16 @@ const App: React.FC = () => {
             />;
         default:
              return <HomeScreen 
-                userName={userName} 
-                userAvatar={userAvatar}
-                subjects={subjects}
+                userData={userData}
                 onAddSubject={handleAddSubject}
                 onUpdateSubject={handleUpdateSubject}
                 onNavigateToSettings={() => setCurrentScreen('settings')}
-                events={timetableEvents}
             />;
     }
   };
 
-  if (loading) {
-    return (
-        <div className="bg-[#1F2125] h-screen flex items-center justify-center">
-            <LoadingSpinner text="Loading your dashboard..." />
-        </div>
-    )
-  }
-
-  if (!session) {
-    return <Auth />;
-  }
-
-  if (personalizationStep !== 'complete') {
-    if (personalizationStep === 'welcome') {
-      return <PersonalizationWelcome onReady={handleStartPersonalization} />;
-    }
-    if (personalizationStep === 'quiz') {
-      return <PersonalizationQuiz onComplete={handlePersonalizationComplete} />;
-    }
-  }
-  
   const mainScreens: Screen[] = ['home', 'flashcards', 'notes', 'timetable'];
   const showNavBar = mainScreens.includes(currentScreen) && !selectedNote && !isAddEventModalOpen;
-
 
   return (
     <div className="bg-[#1F2125] h-screen overflow-hidden">

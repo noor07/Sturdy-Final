@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, useLayoutEffect, useMemo } from 'react';
 import type { TimetableEvent } from '../types';
+import { UserData } from '../App';
 import { AddIcon } from './icons/Icons';
 import AddEventModal from './AddEventModal';
 
 interface TimetableScreenProps {
     onBack: () => void;
-    events: TimetableEvent[];
+    userData: UserData;
     onAddEvent: (event: Omit<TimetableEvent, 'id'>) => void;
     onUpdateEvent: (eventId: string, updatedData: Partial<Omit<TimetableEvent, 'id'>>) => void;
     onDeleteEvent: (eventId: string) => void;
@@ -13,7 +14,8 @@ interface TimetableScreenProps {
     setIsModalOpen: (isOpen: boolean) => void;
 }
 
-const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, events, onAddEvent, onUpdateEvent, onDeleteEvent, isModalOpen, setIsModalOpen }) => {
+const TimetableScreen: React.FC<TimetableScreenProps> = ({ onBack, userData, onAddEvent, onUpdateEvent, onDeleteEvent, isModalOpen, setIsModalOpen }) => {
+    const { timetableEvents: events } = userData;
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentTime, setCurrentTime] = useState(new Date());
     const [editingEvent, setEditingEvent] = useState<TimetableEvent | null>(null);

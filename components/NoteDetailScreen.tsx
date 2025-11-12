@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { Note, Subject } from '../types';
+import { UserData } from '../App';
 import { CameraIcon, CloseIcon, AddIcon, ArrowBackIcon, EditIcon, ChevronDownIcon } from './icons/Icons';
 import RichTextEditor from './RichTextEditor';
 
 interface NoteDetailScreenProps {
     note: Note;
-    subjects: Subject[];
+    userData: UserData;
     onBack: () => void;
     onUpdateNote: (noteId: string, updatedData: Partial<Omit<Note, 'id' | 'created_at'>>) => void;
 }
 
-const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, subjects, onBack, onUpdateNote }) => {
+const NoteDetailScreen: React.FC<NoteDetailScreenProps> = ({ note, userData, onBack, onUpdateNote }) => {
+    const { subjects } = userData;
     const [isEditing, setIsEditing] = useState(false);
     
     // State for the edit form

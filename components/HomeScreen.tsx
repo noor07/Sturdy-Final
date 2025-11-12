@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import type { Subject, TimetableEvent, Topic, SubTopic } from '../types';
+import { UserData } from '../App';
 import { Avatars } from './icons/Avatars';
 import { SettingsIcon, EditIcon, ChevronDownIcon, ChevronUpIcon, PlayArrowIcon, CheckIcon, AddIcon, CloseIcon } from './icons/Icons';
 
@@ -75,23 +76,23 @@ const AddItemInput: React.FC<{ onSave: (name: string) => void, onCancel: () => v
 };
 
 interface HomeScreenProps {
-    userName: string;
-    userAvatar: number;
-    subjects: Subject[];
+    userData: UserData;
     onAddSubject: (name: string) => void;
     onUpdateSubject: (subject: Subject) => void;
     onNavigateToSettings: () => void;
-    events: TimetableEvent[];
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects, onAddSubject, onUpdateSubject, onNavigateToSettings, events }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ userData, onAddSubject, onUpdateSubject, onNavigateToSettings }) => {
+    const { profile, subjects, timetableEvents } = userData;
+    const { username, avatar_id } = profile;
+
     const [activeDate, setActiveDate] = useState<number>(18);
     const [addingState, setAddingState] = useState<{ type: 'topic' | 'subtopic'; parentId: string } | null>(null);
     const [isAddingSubject, setIsAddingSubject] = useState(false);
     
     const { eventToShow, eventStatus } = useMemo(() => {
         const now = new Date();
-        const todayEvents = events
+        const todayEvents = timetableEvents
             .filter(event => {
                 const eventDate = new Date(event.start_time);
                 return eventDate.getFullYear() === now.getFullYear() &&
@@ -116,7 +117,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
         }
 
         return { eventToShow: null, eventStatus: null };
-    }, [events]);
+    }, [timetableEvents]);
     
     const toggleSubject = (id: string) => {
         const subject = subjects.find(s => s.id === id);
@@ -185,9 +186,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userName, userAvatar, subjects,
       <div className="p-4 max-w-md mx-auto pb-32">
         <header className="flex justify-between items-center py-4">
           <div className="flex items-center gap-3">
-             {React.createElement(Avatars[userAvatar] || Avatars[8], { className: 'w-12 h-12' })}
+             {React.createElement(Avatars[avatar_id] || Avatars[8], { className: 'w-12 h-12' })}
             <div>
-              <p className="text-lg font-bold">Hi, {userName}</p>
+              <p className="text-lg font-bold">Hi, {username}</p>
               <p className="text-sm text-gray-400">{getGreeting()}</p>
             </div>
           </div>

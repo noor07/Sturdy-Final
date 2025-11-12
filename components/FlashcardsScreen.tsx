@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import type { Flashcard, Subject, FlashcardSet } from '../types';
+import { UserData } from '../App';
 import LoadingSpinner from './LoadingSpinner';
 import { ErrorIcon, ChevronDownIcon, FlashcardCheckIcon, FlashcardXIcon, TrophyIcon, ShuffleIcon, ReplayIcon } from './icons/Icons';
 
@@ -21,13 +22,13 @@ interface FlashcardStudySession {
 }
 
 interface FlashcardsScreenProps {
-    subjects: Subject[];
-    flashcardSets: Record<string, FlashcardSet>;
+    userData: UserData;
     onGenerate: (topicId: string, topicName: string, subjectName: string) => Promise<void>;
     onUpdateScore: (topicId: string, pointsToAdd: number) => void;
 }
 
-const FlashcardsScreen: React.FC<FlashcardsScreenProps> = ({ subjects, flashcardSets, onGenerate, onUpdateScore }) => {
+const FlashcardsScreen: React.FC<FlashcardsScreenProps> = ({ userData, onGenerate, onUpdateScore }) => {
+    const { subjects, flashcardSets } = userData;
     const [selectedTopicId, setSelectedTopicId] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);

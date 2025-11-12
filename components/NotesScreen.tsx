@@ -1,18 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { Subject, Note } from '../types';
+import { UserData } from '../App';
 import { SearchIcon, BookIcon, CameraIcon, AddIcon, CloseIcon, TrashIcon, ChevronDownIcon, ChecklistIcon, TextIcon } from './icons/Icons';
 import RichTextEditor from './RichTextEditor';
 
 interface NotesScreenProps {
     onBack: () => void;
-    subjects: Subject[];
-    notes: Note[];
+    userData: UserData;
     onAddNote: (note: Omit<Note, 'id' | 'created_at'>) => void;
     onSelectNote: (note: Note) => void;
     onDeleteNote: (noteId: string) => void;
 }
 
-const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, subjects, notes, onAddNote, onSelectNote, onDeleteNote }) => {
+const NotesScreen: React.FC<NotesScreenProps> = ({ onBack, userData, onAddNote, onSelectNote, onDeleteNote }) => {
+    const { subjects, notes } = userData;
     const [isFabMenuOpen, setIsFabMenuOpen] = useState(false);
     const [isCreateTextNoteModalOpen, setIsCreateTextNoteModalOpen] = useState(false);
     const [isCreateImageNoteModalOpen, setIsCreateImageNoteModalOpen] = useState(false);

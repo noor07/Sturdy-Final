@@ -103,81 +103,115 @@ export const SYLLABUS_DATA: Record<string, RawSubject[]> = {
       },
     ],
   'Class 12 Board Exams': [
-    {
-      name: 'Physics',
-      topics: [
-        {
-          name: 'Electrostatics',
-          subTopics: [
-            { name: 'Electric Charges and Fields' },
-            { name: 'Electrostatic Potential and Capacitance' },
-          ],
-        },
-        {
-          name: 'Current Electricity',
-          subTopics: [
-            { name: 'Ohm\'s Law and Resistance' },
-            { name: 'Kirchhoff\'s Laws' },
-            { name: 'Potentiometer' },
-          ],
-        },
-        {
-            name: 'Magnetic Effects of Current and Magnetism',
-            subTopics: [
-              { name: 'Moving Charges and Magnetism' },
-              { name: 'Magnetism and Matter' },
-            ],
-        },
-      ],
-    },
-    {
-      name: 'Chemistry',
-      topics: [
-        {
-          name: 'Solutions',
-          subTopics: [
-            { name: 'Types of Solutions' },
-            { name: 'Colligative Properties' },
-          ],
-        },
-        {
-          name: 'Electrochemistry',
-          subTopics: [
-            { name: 'Electrochemical Cells' },
-            { name: 'Nernst Equation' },
-          ],
-        },
-        {
-            name: 'd-and f-Block Elements',
-            subTopics: [
-                { name: 'General Properties' },
-                { name: 'Lanthanoids and Actinoids' },
-            ],
-        }
-      ],
-    },
-    {
+      {
         name: 'Mathematics',
         topics: [
-            {
-                name: 'Relations and Functions',
-                subTopics: [
-                    { name: 'Types of Relations' },
-                    { name: 'Types of Functions' },
-                    { name: 'Inverse Trigonometric Functions' },
-                ]
-            },
-            {
-                name: 'Calculus',
-                subTopics: [
-                    { name: 'Continuity and Differentiability' },
-                    { name: 'Integrals' },
-                    { name: 'Differential Equations' },
-                ]
-            }
+            { name: 'Relations and Functions', subTopics: [{ name: 'Types of relations and functions (one-one, onto)' }, { name: 'Basic properties' }] },
+            { name: 'Inverse Trigonometric Functions', subTopics: [{ name: 'Principal value branches' }] },
+            { name: 'Matrices & Determinants', subTopics: [{ name: 'Inverse of a matrix using elementary operations' }, { name: 'Solving systems of linear equations' }] },
+            { name: 'Continuity and Differentiability', subTopics: [{ name: 'Concept of continuity and differentiability' }, { name: 'Derivatives of composite, implicit, and inverse trigonometric functions' }] },
+            { name: 'Application of Derivatives', subTopics: [{ name: 'Tangents and normals' }, { name: 'Maxima and minima' }, { name: 'Rate of change of quantities' }] },
+            { name: 'Integrals', subTopics: [{ name: 'Integration by substitution, by partial fractions, and by parts' }, { name: 'Properties of definite integrals' }] },
+            { name: 'Application of Integrals', subTopics: [{ name: 'Finding the area under simple curves' }] },
+            { name: 'Differential Equations', subTopics: [{ name: 'Solving first-order, first-degree differential equations (homogeneous, linear)' }] },
+            { name: 'Vector Algebra & 3D Geometry', subTopics: [{ name: 'Dot and Cross products' }, { name: 'Shortest distance between two lines in 3D' }, { name: 'Equations of lines and planes' }] },
+            { name: 'Linear Programming', subTopics: [{ name: 'Formulating and solving LPPs graphically' }] },
+            { name: 'Probability', subTopics: [{ name: 'Conditional probability and independence' }, { name: 'Bayes\' theorem' }] },
         ]
-    }
-  ],
+      },
+      {
+        name: 'English (Core)',
+        topics: [
+            { name: 'Reading Skills', subTopics: [{ name: 'Unseen Passage (Factual/Descriptive)' }, { name: 'Analyzing data-based passages with visual inputs' }, { name: 'Note-Making and Summarization' }] },
+            { name: 'Writing Skills', subTopics: [{ name: 'Invitations: Formal and informal invitations and their replies' }, { name: 'Letter Writing: Application for a job (with bio-data/resume), Letter to the Editor' }, { name: 'Article and Report Writing' }] },
+            { name: 'The Last Lesson', subTopics: [{ name: 'Theme: Linguistic chauvinism, importance of one\'s language' }, { name: 'Character: M. Hamel' }] },
+            { name: 'Lost Spring', subTopics: [{ name: 'Themes: Grinding poverty, child labour, lost childhood' }, { name: 'Characters: Saheb and Mukesh' }] },
+            { name: 'Deep Water', subTopics: [{ name: 'Themes: Overcoming fear, perseverance, psychological analysis of fear' }] },
+            { name: 'The Rattrap', subTopics: [{ name: 'Themes: Inherent human goodness, metaphor of the world as a rattrap' }] },
+            { name: 'Indigo', subTopics: [{ name: 'Themes: Effective leadership, civil disobedience, Champaran Movement' }, { name: 'Role of Mahatma Gandhi' }] },
+            { name: 'Going Places', subTopics: [{ name: 'Themes: Adolescent fantasies, hero-worship, escapism vs. reality' }, { name: 'Character: Sophie' }] },
+            { name: 'My Mother at Sixty-Six', subTopics: [{ name: 'Themes: Aging, fear of separation, filial bond' }, { name: 'Poetic Devices: Simile, metaphor, personification' }] },
+            { name: 'Keeping Quiet', subTopics: [{ name: 'Themes: Introspection, peace, universal brotherhood' }, { name: 'Symbolism' }] },
+            { name: 'A Thing of Beauty', subTopics: [{ name: 'Themes: Nature\'s beauty and its healing power' }, { name: 'Poetic Devices' }] },
+            { name: 'A Roadside Stand', subTopics: [{ name: 'Themes: Rural-urban divide, the plight of the poor, unfulfilled promises' }] },
+            { name: 'Aunt Jennifer\'s Tigers', subTopics: [{ name: 'Themes: Patriarchal oppression, artistic expression as an escape' }, { name: 'Symbolism of the tigers' }] },
+            { name: 'The Third Level', subTopics: [{ name: 'Themes: Intersection of time and space, escapism from modern life' }] },
+            { name: 'The Tiger King', subTopics: [{ name: 'Themes: Satire on power, pride, and bureaucracy; wildlife conservation' }] },
+            { name: 'Journey to the end of the Earth', subTopics: [{ name: 'Themes: Impact of humans on Earth, climate change, the importance of Antarctica' }] },
+            { name: 'The Enemy', subTopics: [{ name: 'Themes: Conflict between patriotism and humanity, kindness' }] },
+            { name: 'On the Face of It', subTopics: [{ name: 'Themes: Loneliness, optimism, perspective, looking beyond appearances' }] },
+            { name: 'Memories of Childhood', subTopics: [{ name: 'Themes: Caste and racial discrimination, protest, and dignity' }] },
+        ]
+      },
+      {
+        name: 'Physics',
+        topics: [
+            { name: 'Electric Charges and Fields', subTopics: [{ name: 'Coulomb\'s Law' }, { name: 'Electric Field and Dipole' }, { name: 'Gauss\'s Law and its applications' }] },
+            { name: 'Electrostatic Potential and Capacitance', subTopics: [{ name: 'Electric Potential and Equipotential surfaces' }, { name: 'Capacitance in series and parallel' }, { name: 'Energy stored in a capacitor' }] },
+            { name: 'Current Electricity', subTopics: [{ name: 'Ohm\'s Law and Kirchhoff\'s Laws' }, { name: 'Potentiometer and Meter Bridge' }] },
+            { name: 'Moving Charges and Magnetism', subTopics: [{ name: 'Biot-Savart Law and Ampere\'s Law' }, { name: 'Lorentz Force and Cyclotron' }] },
+            { name: 'Electromagnetic Induction & AC', subTopics: [{ name: 'Faraday\'s Law of Induction and Lenz\'s Law' }, { name: 'LCR series circuit and resonance' }, { name: 'AC Generator and Transformer' }] },
+            { name: 'Optics (Ray & Wave)', subTopics: [{ name: 'Lens Maker\'s formula, Microscope, Telescope' }, { name: 'Huygens\' principle, Interference (YDSE), Diffraction' }] },
+            { name: 'Dual Nature, Atoms & Nuclei', subTopics: [{ name: 'Photoelectric effect, de Broglie relation' }, { name: 'Bohr model of the atom' }, { name: 'Mass-energy relation, nuclear fission and fusion' }] },
+            { name: 'Semiconductor Electronics', subTopics: [{ name: 'Energy bands in solids' }, { name: 'P-N junction diode' }, { name: 'Diode as a rectifier' }] },
+        ]
+      },
+      {
+        name: 'Chemistry',
+        topics: [
+            { name: 'Solutions', subTopics: [{ name: 'Colligative properties (RLVP, Ebullition, etc.)' }, { name: 'Galvanic cells' }] },
+            { name: 'Electrochemistry', subTopics: [{ name: 'Nernst equation' }, { name: 'Kohlrausch\'s law' }] },
+            { name: 'Chemical Kinetics', subTopics: [{ name: 'Order of a reaction' }, { name: 'Integrated rate equations (zero and first order)' }, { name: 'Arrhenius equation' }] },
+            { name: 'd- and f-Block & Coordination', subTopics: [{ name: 'General trends in properties of transition metals' }, { name: 'Lanthanoid contraction' }, { name: 'Nomenclature, VBT, and CFT of coordination compounds' }] },
+            { name: 'Haloalkanes, Alcohols, Phenols', subTopics: [{ name: 'Mechanism of SN1 and SN2 reactions' }] },
+            { name: 'Aldehydes, Ketones, Carboxylic Acids', subTopics: [{ name: 'Important named reactions (Aldol, Cannizzaro, etc.)' }, { name: 'Acidity' }] },
+            { name: 'Amines & Biomolecules', subTopics: [{ name: 'Basicity of amines' }, { name: 'Diazonium salts' }, { name: 'Carbohydrates, Proteins, Nucleic Acids' }] },
+        ]
+      },
+      {
+        name: 'Biology',
+        topics: [
+            { name: 'Reproduction', subTopics: [{ name: 'Sexual Reproduction in Flowering Plants (Double fertilization)' }, { name: 'Human Reproduction (Menstrual cycle)' }, { name: 'Reproductive Health (Contraception, STDs)' }] },
+            { name: 'Genetics and Evolution', subTopics: [{ name: 'Principles of Inheritance (Mendel\'s Laws, Genetic disorders)' }, { name: 'Molecular Basis of Inheritance (DNA replication, transcription, translation)' }] },
+            { name: 'Biology and Human Welfare', subTopics: [{ name: 'Human Health and Disease (Immunity, Cancer, AIDS)' }] },
+            { name: 'Biotechnology', subTopics: [{ name: 'Principles and Processes (Recombinant DNA technology)' }, { name: 'Applications in agriculture (Bt-cotton) and medicine (Insulin)' }] },
+            { name: 'Ecology and Environment', subTopics: [{ name: 'Organisms and Populations (Population interactions)' }, { name: 'Ecosystem (Trophic levels, Pyramids)' }, { name: 'Biodiversity and its Conservation' }] },
+        ]
+      },
+      {
+        name: 'Accountancy',
+        topics: [
+            { name: 'Partnership & Company Accounts', subTopics: [{ name: 'Valuation of Goodwill, Admission/Retirement of Partner' }, { name: 'Issue of Shares and Debentures, Forfeiture of Shares' }] },
+            { name: 'Analysis of Financial Statements', subTopics: [{ name: 'Comparative and Common-size statements' }, { name: 'Accounting Ratios: Liquidity, Solvency, etc.' }, { name: 'Cash Flow Statement (Operating, Investing, Financing activities)' }] },
+        ]
+      },
+      {
+        name: 'Business Studies',
+        topics: [
+            { name: 'Principles & Functions of Management', subTopics: [{ name: 'Fayol\'s principles, Taylor\'s scientific management' }, { name: 'Planning, Organising, Staffing, Directing, Controlling' }] },
+            { name: 'Business Finance and Marketing', subTopics: [{ name: 'Financial Management (Capital structure, Working capital)' }, { name: 'Financial Markets (Money vs. Capital, SEBI)' }, { name: 'Marketing Mix (Product, Price, Place, Promotion)' }, { name: 'Consumer Protection Act' }] },
+        ]
+      },
+      {
+        name: 'Economics',
+        topics: [
+            { name: 'Macroeconomics', subTopics: [{ name: 'National Income calculation' }, { name: 'Functions of Money and Banking (RBI)' }, { name: 'Determination of Income and Employment (AD-AS framework)' }, { name: 'Government Budget' }, { name: 'Balance of Payments' }] },
+            { name: 'Indian Economic Development', subTopics: [{ name: 'State of Indian economy pre- and post-independence' }, { name: 'Economic reforms (LPG)' }, { name: 'Current challenges (Poverty, Human Capital, etc.)' }] },
+        ]
+      },
+      {
+        name: 'History',
+        topics: [
+            { name: 'Themes in Indian History', subTopics: [{ name: 'Indus Valley Civilizations' }, { name: 'Bhakti-Sufi Traditions' }, { name: 'Vijayanagara Empire' }, { name: 'The Revolt of 1857' }, { name: 'Mahatma Gandhi and the Nationalist Movement' }, { name: 'Framing the Constitution' }] },
+        ]
+      },
+      {
+        name: 'Political Science',
+        topics: [
+            { name: 'Contemporary World & Indian Politics', subTopics: [{ name: 'The Cold War Era' }, { name: 'End of Bipolarity' }, { name: 'Challenges of Nation-Building' }, { name: 'The Crisis of the Democratic Order' }, { name: 'Recent Developments in Indian Politics' }] },
+        ]
+      }
+    ],
   'JEE Main': [
     {
       name: 'Physics',
