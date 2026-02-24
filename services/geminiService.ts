@@ -1,24 +1,26 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+const ai = new GoogleGenAI({
+    apiKey: import.meta.env.VITE_GEMINI_API_KEY || 'dummy_key'
+});
 
 export async function generateStudyNotes(topic: string): Promise<string> {
-  const prompt = `Generate a comprehensive, well-structured study guide for the topic: "${topic}".
+    const prompt = `Generate a comprehensive, well-structured study guide for the topic: "${topic}".
   Use markdown-style headings, bullet points, and bold text to organize the information clearly.
   The guide should be detailed enough for someone preparing for an examination on this subject.
   Start with a brief introduction to the topic.`;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-    });
-    return response.text;
-  } catch (error) {
-    console.error("Gemini API call failed for notes:", error);
-    throw new Error("Failed to generate study notes from Gemini API.");
-  }
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+        });
+        return response.text;
+    } catch (error) {
+        console.error("Gemini API call failed for notes:", error);
+        throw new Error("Failed to generate study notes from Gemini API.");
+    }
 }
 
 export async function generateQuiz(topic: string): Promise<any> {
